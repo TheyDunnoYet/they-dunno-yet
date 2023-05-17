@@ -7,6 +7,7 @@ const app = express();
 connectDB();
 
 app.get("/", (req, res) => res.send("API Running"));
+app.use("/api/feed", require("./routes/feed"));
 
 const PORT = process.env.PORT || 5001;
 

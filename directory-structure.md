@@ -19,7 +19,7 @@
         db.js (https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/config/db.js)
         default.json
     /routes
-        auth.js
+        auth.js (https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/routes/auth.js)
     server.js (https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/server.js)
     package.json (https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/package.json)
     .gitignore (https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/.gitignore)
