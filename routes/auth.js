@@ -149,51 +149,66 @@ router.get("/user", auth, async (req, res) => {
 // @route   PUT api/auth/user
 // @desc    Edit user profile
 // @access  Private
-router.put(
-  "/user",
-  [
-    auth,
-    [
-      check("name", "Name is required").not().isEmpty(),
-      check("email", "Please include a valid email").isEmail({
-        ignore_whitespace: false,
-        normalize_email: false,
-      }),
-    ],
-  ],
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+router.put("/user", auth, async (req, res) => {
+  // Destructure the fields from the request body
+  const {
+    name,
+    email,
+    password,
+    newPassword,
+    avatar,
+    about,
+    twitter,
+    website,
+  } = req.body;
+
+  try {
+    let user = await User.findById(req.user.id);
+
+    if (!user) return res.status(404).json({ msg: "User not found" });
+
+    // Verify current password if a new password is provided
+    if (newPassword) {
+      if (!password) {
+        return res
+          .status(400)
+          .json({ msg: "Current password is required to set a new password" });
+      }
+
+      // Check if newPassword meets requirements
+      if (newPassword.length < 6) {
+        return res
+          .status(400)
+          .json({ msg: "New password must be at least 6 characters long" });
+      }
+
+      const isMatch = await bcrypt.compare(password, user.password);
+
+      if (!isMatch) {
+        return res.status(400).json({ msg: "Current password is incorrect" });
+      }
+
+      // Hash the new password
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(newPassword, salt);
     }
 
-    const { name, email, avatar, about, twitter, website } = req.body;
+    // Update the other fields
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (avatar) user.avatar = avatar;
+    if (about) user.about = about;
+    if (twitter) user.twitter = twitter;
+    if (website) user.website = website;
 
-    const userFields = {};
-    if (name) userFields.name = name;
-    if (email) userFields.email = email;
-    if (avatar) userFields.avatar = avatar;
-    if (about) userFields.about = about;
-    if (twitter) userFields.twitter = twitter;
-    if (website) userFields.website = website;
+    // Save the updated user
+    await user.save();
 
-    try {
-      let user = await User.findById(req.user.id);
-
-      if (!user) return res.status(404).json({ msg: "User not found" });
-
-      user = await User.findByIdAndUpdate(
-        req.user.id,
-        { $set: userFields },
-        { new: true }
-      );
-
-      res.json(user);
-    } catch (err) {
-      console.error(err.message);
-      res.status(500).send("Server error");
-    }
+    res.json(user);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server error");
   }
-);
+});
 
 module.exports = router;
