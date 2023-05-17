@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { check, validationResult } = require("express-validator");
 const auth = require("../middleware/auth");
-
+const admin = require("../middleware/admin");
 const Tag = require("../models/Tag");
 
 // @route   POST api/tag
