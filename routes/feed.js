@@ -28,9 +28,12 @@ router.post(
       return res.status(400).json({ errors: errors.array() });
     }
 
+    const { name, description } = req.body;
+
     try {
       const newFeed = new Feed({
-        name: req.body.name,
+        name,
+        description,
         user: req.user.id,
       });
 
@@ -47,10 +50,11 @@ router.post(
 // PUT to Update a Feed
 // route protected by auth middleware
 router.put("/:id", auth, async (req, res) => {
-  const { name } = req.body;
+  const { name, description } = req.body;
 
   const feedFields = {};
   if (name) feedFields.name = name;
+  if (description) feedFields.description = description;
 
   try {
     let feed = await Feed.findById(req.params.id);

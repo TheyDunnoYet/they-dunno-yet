@@ -5,31 +5,27 @@ const auth = require("../middleware/auth");
 const Topic = require("../models/Topic");
 
 // @route   POST api/topic
-// @desc    Create a new topic
+// @desc    Add new topic
 // @access  Private
 router.post(
   "/",
-  auth,
-  [
-    check("name", "Topic name is required").not().isEmpty(),
-    check("description", "Topic description is required").not().isEmpty(),
-  ],
+  [auth, [check("name", "Name is required").not().isEmpty()]],
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { name, description } = req.body;
+    const { name, description, feed } = req.body;
 
     try {
-      let topic = new Topic({
-        user: req.user.id,
+      const newTopic = new Topic({
         name,
         description,
+        feed,
       });
 
-      await topic.save();
+      const topic = await newTopic.save();
 
       res.json(topic);
     } catch (err) {
@@ -78,51 +74,32 @@ router.get("/:id", async (req, res) => {
 // @route   PUT api/topic/:id
 // @desc    Update topic
 // @access  Private
-router.put(
-  "/:id",
-  auth,
-  [
-    check("name", "Topic name is required").not().isEmpty(),
-    check("description", "Topic description is required").not().isEmpty(),
-  ],
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
+router.put("/:id", auth, async (req, res) => {
+  const { name, description, feed } = req.body;
 
-    const { name, description } = req.body;
+  // Build topic object
+  const topicFields = {};
+  if (name) topicFields.name = name;
+  if (description) topicFields.description = description;
+  if (feed) topicFields.feed = feed;
 
-    try {
-      let topic = await Topic.findById(req.params.id);
+  try {
+    let topic = await Topic.findById(req.params.id);
 
-      if (!topic) {
-        return res.status(404).json({ msg: "Topic not found" });
-      }
+    if (!topic) return res.status(404).json({ msg: "Topic not found" });
 
-      // Make sure user owns the topic
-      if (topic.user.toString() !== req.user.id) {
-        return res.status(401).json({ msg: "Not authorized" });
-      }
+    topic = await Topic.findByIdAndUpdate(
+      req.params.id,
+      { $set: topicFields },
+      { new: true }
+    );
 
-      topic = await Topic.findByIdAndUpdate(
-        req.params.id,
-        { $set: { name, description } },
-        { new: true }
-      );
-
-      res.json(topic);
-    } catch (err) {
-      console.error(err.message);
-
-      if (err.kind === "ObjectId") {
-        return res.status(404).json({ msg: "Topic not found" });
-      }
-
-      res.status(500).send("Server Error");
-    }
+    res.json(topic);
+  } catch (err) {
+    console.error(er.message);
+    res.status(500).send("Server Error");
   }
-);
+});
 
 // @route   DELETE api/topic/:id
 // @desc    Delete topic
@@ -133,11 +110,6 @@ router.delete("/:id", auth, async (req, res) => {
 
     if (!topic) {
       return res.status(404).json({ msg: "Topic not found" });
-    }
-
-    // Make sure user owns the topic
-    if (topic.user.toString() !== req.user.id) {
-      return res.status(401).json({ msg: "Not authorized" });
     }
 
     await Topic.findByIdAndRemove(req.params.id);
