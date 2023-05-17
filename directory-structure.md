@@ -1,0 +1,21 @@
+/they-dunno-yet
+    /client
+        /public
+        /src
+            /components
+            /redux
+                /actions
+                /reducers
+            App.js
+            index.js
+        package.json
+    /models
+        Feed.js
+        Product.js
+        Tag.js
+        Topic.js
+        User.js
+    server.js
+    package.json
+    .gitignore
+    .eslintrc.json
