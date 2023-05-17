@@ -20,6 +20,9 @@
         default.json
     /routes
         auth.js (https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/routes/auth.js)
+        feed.js (https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/routes/feed.js)
+    /middleware
+        auth.js (https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/middleware/auth.js)
     server.js (https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/server.js)
     package.json (https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/package.json)
     .gitignore (https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/.gitignore)
