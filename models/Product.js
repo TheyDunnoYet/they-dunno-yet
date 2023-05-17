@@ -21,8 +21,9 @@ const ProductSchema = new mongoose.Schema({
   },
   upvotes: [
     {
-      type: mongoose.Schema.Types.ObjectId,
+      type: [mongoose.Schema.Types.ObjectId],
       ref: "User",
+      default: [],
     },
   ],
 });

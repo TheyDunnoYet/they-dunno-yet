@@ -7,7 +7,9 @@ const { check, validationResult } = require("express-validator");
 
 const User = require("../models/User");
 
-// Register User
+// @route   POST api/auth/register
+// @desc    Register User
+// @access  Private
 router.post(
   "/register",
   [
@@ -69,7 +71,9 @@ router.post(
   }
 );
 
-// Login User
+// @route   POST api/auth/login
+// @desc    Login User
+// @access  Private
 router.post(
   "/login",
   [
@@ -114,6 +118,66 @@ router.post(
           res.json({ token });
         }
       );
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send("Server error");
+    }
+  }
+);
+
+// @route   GET api/auth/user
+// @desc    Get user profile
+// @access  Private
+router.get("/user", auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+    res.json(user);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server error");
+  }
+});
+
+// @route   PUT api/auth/user
+// @desc    Edit user profile
+// @access  Private
+router.put(
+  "/user",
+  [
+    auth,
+    [
+      check("name", "Name is required").not().isEmpty(),
+      check("email", "Please include a valid email").isEmail(),
+    ],
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { name, email, avatar, about, twitter, website } = req.body;
+
+    const userFields = {};
+    if (name) userFields.name = name;
+    if (email) userFields.email = email;
+    if (avatar) userFields.avatar = avatar;
+    if (about) userFields.about = about;
+    if (twitter) userFields.twitter = twitter;
+    if (website) userFields.website = website;
+
+    try {
+      let user = await User.findById(req.user.id);
+
+      if (!user) return res.status(404).json({ msg: "User not found" });
+
+      user = await User.findByIdAndUpdate(
+        req.user.id,
+        { $set: userFields },
+        { new: true }
+      );
+
+      res.json(user);
     } catch (err) {
       console.error(err.message);
       res.status(500).send("Server error");
