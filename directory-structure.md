@@ -23,6 +23,7 @@
         feed.js (https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/routes/feed.js)
         topic.js (https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/routes/topic.js)
         product.js (https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/routes/product.js)
+        tags.js ()
     /middleware
         auth.js (https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/middleware/auth.js)
     server.js (https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/server.js)
