@@ -15,7 +15,10 @@ router.post(
   "/register",
   [
     check("name", "Name is required").not().isEmpty(),
-    check("email", "Please include a valid email").isEmail(),
+    check("email", "Please include a valid email").isEmail({
+      ignore_whitespace: false,
+      normalize_email: false,
+    }),
     check(
       "password",
       "Please enter a password with 6 or more characters"
@@ -42,10 +45,7 @@ router.post(
         password,
       });
 
-      const salt = await bcrypt.genSalt(10);
-
-      user.password = await bcrypt.hash(password, salt);
-
+      // No need to hash the password here. It will be hashed in the pre-save middleware.
       await user.save();
 
       const payload = {
@@ -78,7 +78,10 @@ router.post(
 router.post(
   "/login",
   [
-    check("email", "Please include a valid email").isEmail(),
+    check("email", "Please include a valid email").isEmail({
+      ignore_whitespace: false,
+      normalize_email: false,
+    }),
     check("password", "Password is required").exists(),
   ],
   async (req, res) => {
@@ -92,7 +95,7 @@ router.post(
     try {
       let user = await User.findOne({ email });
 
-      console.log("User:", user);
+      // console.log("User:", user);
 
       if (!user) {
         return res.status(400).json({ msg: "Invalid Credentials" });
@@ -100,7 +103,7 @@ router.post(
 
       const isMatch = await bcrypt.compare(password, user.password);
 
-      console.log("isMatch:", isMatch);
+      // console.log("isMatch:", isMatch);
 
       if (!isMatch) {
         return res.status(400).json({ msg: "Invalid Credentials" });
@@ -152,7 +155,10 @@ router.put(
     auth,
     [
       check("name", "Name is required").not().isEmpty(),
-      check("email", "Please include a valid email").isEmail(),
+      check("email", "Please include a valid email").isEmail({
+        ignore_whitespace: false,
+        normalize_email: false,
+      }),
     ],
   ],
   async (req, res) => {
