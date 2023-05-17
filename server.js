@@ -7,6 +7,12 @@ const app = express();
 connectDB();
 
 app.get("/", (req, res) => res.send("API Running"));
+
+// Middleware
+app.use(express.json());
+
+// Routes
+app.use("/api/auth", require("./routes/auth")); // Add this line
 app.use("/api/feed", require("./routes/feed"));
 app.use("/api/topic", require("./routes/topic"));
 app.use("/api/product", require("./routes/product"));
