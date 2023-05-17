@@ -22,6 +22,7 @@ router.get("/", async (req, res) => {
 router.post(
   "/",
   [auth, [check("name", "Name is required").not().isEmpty()]],
+  admin,
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -49,7 +50,7 @@ router.post(
 
 // PUT to Update a Feed
 // route protected by auth middleware
-router.put("/:id", auth, async (req, res) => {
+router.put("/:id", auth, admin, async (req, res) => {
   const { name, description } = req.body;
 
   const feedFields = {};
@@ -76,7 +77,7 @@ router.put("/:id", auth, async (req, res) => {
 
 // DELETE a Feed
 // route protected by auth middleware
-router.delete("/:id", auth, async (req, res) => {
+router.delete("/:id", auth, admin, async (req, res) => {
   try {
     let feed = await Feed.findById(req.params.id);
 

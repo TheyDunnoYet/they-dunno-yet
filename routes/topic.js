@@ -10,6 +10,7 @@ const Topic = require("../models/Topic");
 router.post(
   "/",
   [auth, [check("name", "Name is required").not().isEmpty()]],
+  admin,
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -74,7 +75,7 @@ router.get("/:id", async (req, res) => {
 // @route   PUT api/topic/:id
 // @desc    Update topic
 // @access  Private
-router.put("/:id", auth, async (req, res) => {
+router.put("/:id", auth, admin, async (req, res) => {
   const { name, description, feed } = req.body;
 
   // Build topic object
@@ -104,7 +105,7 @@ router.put("/:id", auth, async (req, res) => {
 // @route   DELETE api/topic/:id
 // @desc    Delete topic
 // @access  Private
-router.delete("/:id", auth, async (req, res) => {
+router.delete("/:id", auth, admin, async (req, res) => {
   try {
     let topic = await Topic.findById(req.params.id);
 

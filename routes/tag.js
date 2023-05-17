@@ -11,6 +11,7 @@ const Tag = require("../models/Tag");
 router.post(
   "/",
   [auth, [check("name", "Name is required").not().isEmpty()]],
+  admin,
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -50,7 +51,7 @@ router.get("/", async (req, res) => {
 // @route   DELETE api/tag/:id
 // @desc    Delete tag
 // @access  Private
-router.delete("/:id", auth, async (req, res) => {
+router.delete("/:id", auth, admin, async (req, res) => {
   try {
     let tag = await Tag.findById(req.params.id);
 
