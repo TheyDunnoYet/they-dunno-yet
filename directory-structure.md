@@ -16,7 +16,8 @@
         Topic.js (https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/models/Topic.js)
         User.js (https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/models/User.js)
     /config
-        db.js
+        db.js (https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/config/db.js)
+        default.json
     server.js (https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/server.js)
     package.json (https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/package.json)
     .gitignore (https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/.gitignore)
