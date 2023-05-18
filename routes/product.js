@@ -5,6 +5,7 @@ const auth = require("../middleware/auth");
 const admin = require("../middleware/admin");
 const Product = require("../models/Product");
 const User = require("../models/User");
+const Comment = require("../models/Comment");
 
 // @route   POST api/product
 // @desc    Add new product
@@ -208,6 +209,9 @@ router.delete("/:id", auth, async (req, res) => {
     if (product.user.toString() !== req.user.id && user.role !== "Admin") {
       return res.status(401).json({ msg: "User not authorized" });
     }
+
+    // Delete related comments
+    await Comment.deleteMany({ product: req.params.id });
 
     await Product.deleteOne({ _id: req.params.id });
 
