@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const config = require("config");
 const { check, validationResult } = require("express-validator");
 const auth = require("../middleware/auth");
+const admin = require("../middleware/admin");
 
 const User = require("../models/User");
 
@@ -205,6 +206,46 @@ router.put("/user", auth, async (req, res) => {
     await user.save();
 
     res.json(user);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server error");
+  }
+});
+
+// @route   DELETE api/auth/user/:userId
+// @desc    Delete user profile
+// @access  Private
+router.delete("/user/:userId", auth, async (req, res) => {
+  try {
+    const targetUser = await User.findById(req.params.userId);
+    const requestingUser = await User.findById(req.user.id);
+
+    // Allow deletion if the requesting user is the target user or if they're an admin
+    if (
+      requestingUser.id === targetUser.id ||
+      requestingUser.role === "Admin"
+    ) {
+      await User.findByIdAndRemove(req.params.userId);
+      res.json({ msg: "User deleted" });
+    } else {
+      res.status(403).json({ msg: "Unauthorized" });
+    }
+  } catch (err) {
+    console.error(err.message);
+    if (err.kind == "ObjectId") {
+      return res.status(400).json({ msg: "User not found" });
+    }
+    res.status(500).send("Server error");
+  }
+});
+
+// @route   GET api/auth/users
+// @desc    Get all users
+// @access  Private
+router.get("/users", auth, admin, async (req, res) => {
+  try {
+    const users = await User.find().select("-password");
+    res.json(users);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server error");
