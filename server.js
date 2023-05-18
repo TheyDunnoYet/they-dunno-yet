@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const connectDB = require("./config/db");
+const cors = require("cors");
 const rateLimit = require("express-rate-limit");
 
 const app = express();
@@ -12,6 +13,9 @@ app.get("/", (req, res) => res.send("API Running"));
 
 // Middleware
 app.use(express.json());
+
+// CORS Middleware
+app.use(cors());
 
 // Rate Limiting
 app.enable("trust proxy"); // Enable if you're behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
