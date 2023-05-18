@@ -3,6 +3,10 @@
         /public
         /src
             /components
+                AboutPage.js (  )
+                HomePage.js (  )
+                NavBar.js (  )
+                ProductsPage.js (  )
             /redux
                 /actions
                 /reducers

@@ -1,18 +1,17 @@
-import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import NavBar from "./components/NavBar";
-// import other components here once they are created
+import HomePage from "./components/HomePage";
+import AboutPage from "./components/AboutPage";
+import ProductsPage from "./components/ProductsPage";
 
 function App() {
   return (
     <Router>
       <NavBar />
       <Routes>
-        {/* Add routes here as components are created */}
-        {/* <Route path="/" element={<HomePage />} /> */}
-        {/* <Route path="/login" element={<LoginPage />} /> */}
-        {/* <Route path="/signup" element={<SignUpPage />} /> */}
+        <Route path="/" element={<HomePage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/products" element={<ProductsPage />} />
       </Routes>
     </Router>
   );
