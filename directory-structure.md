@@ -6,6 +6,8 @@
             /redux
                 /actions
                 /reducers
+                    index.js (  )
+                store.js (  )
             App.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/client/src/App.js )
             index.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/client/src/index.js )
         package.json ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/client/package.json )
