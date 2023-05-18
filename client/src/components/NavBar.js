@@ -11,6 +11,12 @@ const NavBar = () => {
             They Dunno Yet
           </Link>
         </Typography>
+        <Button color="inherit" component={Link} to="/products">
+          Products
+        </Button>
+        <Button color="inherit" component={Link} to="/about">
+          About
+        </Button>
         <Button color="inherit">
           <Link to="/login" style={{ textDecoration: "none", color: "white" }}>
             Login

@@ -2,16 +2,18 @@
     /client
         /public
         /src
+            /api
+                auth.js (  )
             /components
-                AboutPage.js (  )
-                HomePage.js (  )
-                NavBar.js (  )
-                ProductsPage.js (  )
+                AboutPage.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/client/src/components/AboutPage.js )
+                HomePage.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/client/src/components/HomePage.js )
+                NavBar.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/client/src/components/NavBar.js )
+                ProductsPage.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/client/src/components/ProductsPage.js )
             /redux
                 /actions
                 /reducers
-                    index.js (  )
-                store.js (  )
+                    index.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/client/src/redux/reducers/index.js )
+                store.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/client/src/redux/store.js )
             App.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/client/src/App.js )
             index.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/client/src/index.js )
         package.json ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/client/package.json )
