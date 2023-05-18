@@ -23,7 +23,10 @@ const NavBar = () => {
           </Link>
         </Button>
         <Button color="inherit">
-          <Link to="/signup" style={{ textDecoration: "none", color: "white" }}>
+          <Link
+            to="/register"
+            style={{ textDecoration: "none", color: "white" }}
+          >
             Sign Up
           </Link>
         </Button>
