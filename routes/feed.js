@@ -18,6 +18,25 @@ router.get("/", async (req, res) => {
   }
 });
 
+// @route   GET api/feed/:id
+// @desc    Get a specific feed
+// @access  Public
+router.get("/:id", async (req, res) => {
+  try {
+    const feed = await Feed.findById(req.params.id);
+    if (!feed) {
+      return res.status(404).json({ msg: "Feed not found" });
+    }
+    res.json(feed);
+  } catch (err) {
+    console.error(err.message);
+    if (err.kind == "ObjectId") {
+      return res.status(404).json({ msg: "Feed not found" });
+    }
+    res.status(500).send("Server error");
+  }
+});
+
 // POST a New Feed
 // route protected by auth middleware
 router.post(
@@ -37,7 +56,6 @@ router.post(
       const newFeed = new Feed({
         name,
         description,
-        user: req.user.id,
       });
 
       const feed = await newFeed.save();

@@ -4,6 +4,7 @@ const { check, validationResult } = require("express-validator");
 const auth = require("../middleware/auth");
 const admin = require("../middleware/admin");
 const Product = require("../models/Product");
+const User = require("../models/User");
 
 // @route   POST api/product
 // @desc    Add new product
@@ -62,10 +63,10 @@ router.get("/", async (req, res) => {
   }
 });
 
-// @route   PUT api/product/:id/upvote
+// @route   PUT api/products/upvote/:id
 // @desc    Upvote a product
-// @access  Public
-router.put("/:id/upvote", auth, async (req, res) => {
+// @access  Private
+router.put("/upvote/:id", auth, async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
 
@@ -73,14 +74,52 @@ router.put("/:id/upvote", auth, async (req, res) => {
       return res.status(404).json({ msg: "Product not found" });
     }
 
-    // Check if the user has already upvoted
     if (product.upvotes.includes(req.user.id)) {
-      return res.status(400).json({ msg: "User already upvoted this product" });
+      return res.status(400).json({ msg: "Product already upvoted" });
     }
 
-    product.upvotes.push(req.user.id);
+    product.upvotes.unshift(req.user.id);
 
     await product.save();
+
+    // Add the upvoted product to the user's upvotedProducts array
+    const user = await User.findById(req.user.id);
+    user.upvotedProducts.unshift(product.id);
+    await user.save();
+
+    res.json(product.upvotes);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server error");
+  }
+});
+
+// @route   PUT api/products/downvote/:id
+// @desc    Downvote a product (remove upvote)
+// @access  Private
+router.put("/downvote/:id", auth, async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({ msg: "Product not found" });
+    }
+
+    const removeIndex = product.upvotes.indexOf(req.user.id);
+
+    if (removeIndex === -1) {
+      return res.status(400).json({ msg: "Product has not been upvoted yet" });
+    }
+
+    product.upvotes.splice(removeIndex, 1);
+
+    await product.save();
+
+    // Remove the upvoted product from the user's upvotedProducts array
+    const user = await User.findById(req.user.id);
+    const removeUserIndex = user.upvotedProducts.indexOf(product.id);
+    user.upvotedProducts.splice(removeUserIndex, 1);
+    await user.save();
 
     res.json(product.upvotes);
   } catch (err) {

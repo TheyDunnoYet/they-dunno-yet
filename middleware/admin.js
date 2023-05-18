@@ -1,3 +1,5 @@
+const User = require("../models/User");
+
 const admin = async (req, res, next) => {
   try {
     // Get user from the database
