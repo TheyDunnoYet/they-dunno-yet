@@ -194,31 +194,30 @@ router.put("/:id", auth, async (req, res) => {
 
 // @route   DELETE api/product/:id
 // @desc    Delete a product
-// @access  Private
-router.delete("/:id", auth, admin, async (req, res) => {
+// @access  Private/Admin
+router.delete("/:id", auth, async (req, res) => {
   try {
-    let product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params.id);
+    const user = await User.findById(req.user.id);
 
     if (!product) {
       return res.status(404).json({ msg: "Product not found" });
     }
 
-    // Make sure user owns the product
-    if (product.user.toString() !== req.user.id) {
-      return res.status(401).json({ msg: "Not authorized" });
+    // Check if user is the product owner or an admin
+    if (product.user.toString() !== req.user.id && user.role !== "Admin") {
+      return res.status(401).json({ msg: "User not authorized" });
     }
 
-    await Product.findByIdAndRemove(req.params.id);
+    await Product.deleteOne({ _id: req.params.id });
 
     res.json({ msg: "Product removed" });
   } catch (err) {
     console.error(err.message);
-
     if (err.kind === "ObjectId") {
       return res.status(404).json({ msg: "Product not found" });
     }
-
-    res.status(500).send("Server Error");
+    res.status(500).send("Server error");
   }
 });
 
