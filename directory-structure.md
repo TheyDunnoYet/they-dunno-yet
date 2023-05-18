@@ -26,6 +26,7 @@
         tags.js (https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/routes/tags.js)
     /middleware
         auth.js (https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/middleware/auth.js)
+        admin.js (https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/middleware/admin.js)
     server.js (https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/server.js)
     package.json (https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/package.json)
     .gitignore (https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/.gitignore)
