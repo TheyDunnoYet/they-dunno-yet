@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { connect } from "react-redux";
 import { login } from "../redux/actions/authActions";
+import { useNavigate } from "react-router-dom";
 
 function Login({ login }) {
+  let navigate = useNavigate();
+
   const [userData, setUserData] = useState({
     email: "",
     password: "",
@@ -17,7 +20,13 @@ function Login({ login }) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    login(userData);
+    login(userData)
+      .then(() => {
+        navigate("/"); // redirect user after login
+      })
+      .catch((error) => {
+        // handle error
+      });
   };
 
   return (

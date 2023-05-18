@@ -7,20 +7,24 @@ export const GET_ERRORS = "GET_ERRORS";
 
 // Login User
 export const login = (userData) => (dispatch) => {
-  loginUser(userData)
-    .then((res) => {
-      const { token } = res;
-      // Save to localStorage
-      localStorage.setItem("jwtToken", token);
-      // Fetch the current user
-      dispatch(getCurrentUser());
-    })
-    .catch((err) =>
-      dispatch({
-        type: GET_ERRORS,
-        payload: err.response.data,
+  return new Promise((resolve, reject) => {
+    loginUser(userData)
+      .then((res) => {
+        const { token } = res;
+        // Save to localStorage
+        localStorage.setItem("jwtToken", token);
+        // Fetch the current user
+        dispatch(getCurrentUser());
+        resolve(res);
       })
-    );
+      .catch((err) => {
+        dispatch({
+          type: GET_ERRORS,
+          payload: err.response.data,
+        });
+        reject(err);
+      });
+  });
 };
 
 // Register User
