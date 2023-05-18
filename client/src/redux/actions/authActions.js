@@ -9,7 +9,7 @@ export const GET_ERRORS = "GET_ERRORS";
 export const login = (userData) => (dispatch) => {
   loginUser(userData)
     .then((res) => {
-      const { token } = res.data;
+      const { token } = res;
       // Save to localStorage
       localStorage.setItem("jwtToken", token);
       // Fetch the current user
@@ -27,7 +27,7 @@ export const login = (userData) => (dispatch) => {
 export const register = (userData) => (dispatch) => {
   registerUser(userData)
     .then((res) => {
-      const { token } = res.data;
+      const { token } = res;
       // Save to localStorage
       localStorage.setItem("jwtToken", token);
       // Fetch the current user

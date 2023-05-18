@@ -1,14 +1,14 @@
 import axios from "axios";
 
 // Base URL for our backend server
-const BASE_URL = "http://localhost:5001/api";
+const BASE_URL = "http://localhost:5001/api/auth";
 
 const API = axios.create({ baseURL: BASE_URL });
 
 // Send a POST request to the login endpoint with user credentials
 export const loginUser = async (userCredentials) => {
   try {
-    const { data } = await API.post("/auth/login", userCredentials);
+    const { data } = await API.post("/login", userCredentials);
     return data;
   } catch (error) {
     throw error;
@@ -18,7 +18,7 @@ export const loginUser = async (userCredentials) => {
 // Send a POST request to the register endpoint with user data
 export const registerUser = async (userData) => {
   try {
-    const { data } = await API.post("/auth/register", userData);
+    const { data } = await API.post("/register", userData);
     return data;
   } catch (error) {
     throw error;
@@ -29,7 +29,7 @@ export const registerUser = async (userData) => {
 export const fetchCurrentUser = async (token) => {
   try {
     API.defaults.headers.common["x-auth-token"] = token;
-    const { data } = await API.get("/auth/user");
+    const { data } = await API.get("/user");
     return data;
   } catch (error) {
     throw error;
