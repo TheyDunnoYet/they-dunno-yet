@@ -52,6 +52,19 @@ router.post(
   }
 );
 
+// @route   GET api/comment
+// @desc    Get all comments
+// @access  Public
+router.get("/", async (req, res) => {
+  try {
+    const comments = await Comment.find().sort({ date: -1 });
+    res.json(comments);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
 // @route   GET api/comment/:id
 // @desc    Get a comment
 // @access  Public

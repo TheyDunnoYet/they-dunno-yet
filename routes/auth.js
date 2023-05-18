@@ -8,6 +8,7 @@ const auth = require("../middleware/auth");
 const admin = require("../middleware/admin");
 
 const User = require("../models/User");
+const Comment = require("../models/Comment");
 
 // @route   POST api/auth/register
 // @desc    Register User
@@ -246,8 +247,12 @@ router.delete("/user/:userId", auth, async (req, res) => {
         await user.save();
       }
 
+      // Delete all comments made by the target user
+      await Comment.deleteMany({ user: targetUserId });
+
       // Now delete the target user
       await User.deleteOne({ _id: targetUserId });
+
       res.json({ msg: "User deleted" });
     } else {
       res.status(403).json({ msg: "Unauthorized" });
