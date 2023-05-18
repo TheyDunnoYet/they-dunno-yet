@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const connectDB = require("./config/db");
+const rateLimit = require("express-rate-limit");
 
 const app = express();
 
@@ -11,6 +12,16 @@ app.get("/", (req, res) => res.send("API Running"));
 
 // Middleware
 app.use(express.json());
+
+// Rate Limiting
+app.enable("trust proxy"); // Enable if you're behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+});
+
+app.use(limiter); // Apply rate limiter to all requests
 
 // Routes
 app.use("/api/auth", require("./routes/auth"));
