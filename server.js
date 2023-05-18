@@ -33,6 +33,7 @@ app.use("/api/feed", require("./routes/feed"));
 app.use("/api/topic", require("./routes/topic"));
 app.use("/api/product", require("./routes/product"));
 app.use("/api/tag", require("./routes/tag"));
+app.use("/api/comment", require("./routes/comment"));
 
 // Error handling middleware
 app.use((err, req, res, next) => {
