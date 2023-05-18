@@ -217,18 +217,37 @@ router.put("/user", auth, async (req, res) => {
 // @access  Private
 router.delete("/user/:userId", auth, async (req, res) => {
   try {
-    const targetUser = await User.findById(req.params.userId);
+    const targetUserId = req.params.userId;
     const requestingUser = await User.findById(req.user.id);
 
     // Allow deletion if the requesting user is the target user or if they're an admin
-    if (
-      requestingUser.id === targetUser.id ||
-      requestingUser.role === "Admin"
-    ) {
+    if (requestingUser.id === targetUserId || requestingUser.role === "Admin") {
+      const targetUser = await User.findById(targetUserId);
+
       if (!targetUser) {
         return res.status(404).json({ msg: "User not found" });
       }
-      await targetUser.remove();
+
+      const usersToUpdate = await User.find({
+        $or: [
+          { "following.user": targetUserId },
+          { "followers.user": targetUserId },
+        ],
+      });
+
+      for (let user of usersToUpdate) {
+        // Remove the targetUser from following and followers lists
+        user.following = user.following.filter(
+          ({ user }) => user.toString() !== targetUserId
+        );
+        user.followers = user.followers.filter(
+          ({ user }) => user.toString() !== targetUserId
+        );
+        await user.save();
+      }
+
+      // Now delete the target user
+      await User.deleteOne({ _id: targetUserId });
       res.json({ msg: "User deleted" });
     } else {
       res.status(403).json({ msg: "Unauthorized" });
