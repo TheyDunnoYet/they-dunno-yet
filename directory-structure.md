@@ -15,7 +15,7 @@
         Tag.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/models/Tag.js )
         Topic.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/models/Topic.js )
         User.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/models/User.js )
-        Comment.js (  )
+        Comment.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/models/Comment.js )
     /config
         db.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/config/db.js )
         default.json
@@ -25,7 +25,7 @@
         topic.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/routes/topic.js )
         product.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/routes/product.js )
         tag.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/routes/tags.js )
-        comment.js (  )
+        comment.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/routes/comment.js )
     /middleware
         auth.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/middleware/auth.js )
         admin.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/middleware/admin.js )

@@ -34,6 +34,22 @@ const UserSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  following: [
+    {
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    },
+  ],
+  followers: [
+    {
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    },
+  ],
 });
 
 UserSchema.pre("save", async function (next) {
@@ -44,6 +60,28 @@ UserSchema.pre("save", async function (next) {
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
   next();
+});
+
+UserSchema.pre("remove", async function (next) {
+  try {
+    const user = this._id;
+
+    await this.model("User").updateMany(
+      {
+        $or: [{ "following.user": user }, { "followers.user": user }],
+      },
+      {
+        $pull: {
+          following: { user: user },
+          followers: { user: user },
+        },
+      },
+      { multi: true } // ensure multiple documents can be updated
+    );
+    next();
+  } catch (err) {
+    next(err);
+  }
 });
 
 module.exports = mongoose.model("User", UserSchema);

@@ -225,7 +225,10 @@ router.delete("/user/:userId", auth, async (req, res) => {
       requestingUser.id === targetUser.id ||
       requestingUser.role === "Admin"
     ) {
-      await User.findByIdAndRemove(req.params.userId);
+      if (!targetUser) {
+        return res.status(404).json({ msg: "User not found" });
+      }
+      await targetUser.remove();
       res.json({ msg: "User deleted" });
     } else {
       res.status(403).json({ msg: "Unauthorized" });
@@ -246,6 +249,113 @@ router.get("/users", auth, admin, async (req, res) => {
   try {
     const users = await User.find().select("-password");
     res.json(users);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server error");
+  }
+});
+
+// @route   PUT api/users/follow/:id
+// @desc    Follow a user
+// @access  Private
+router.put("/follow/:id", auth, async (req, res) => {
+  try {
+    const userToFollow = await User.findById(req.params.id);
+    const currentUser = await User.findById(req.user.id);
+
+    if (!userToFollow) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+
+    // Check if the user is already being followed
+    if (
+      userToFollow.followers.filter(
+        (follower) => follower.user.toString() === req.user.id
+      ).length > 0
+    ) {
+      return res.status(400).json({ msg: "User already followed" });
+    }
+
+    // Add user to following of currentUser
+    currentUser.following.unshift({ user: req.params.id });
+    await currentUser.save();
+
+    // Add currentUser to followers of userToFollow
+    userToFollow.followers.unshift({ user: req.user.id });
+    await userToFollow.save();
+
+    res.json(userToFollow.followers);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server error");
+  }
+});
+
+// @route   PUT api/users/unfollow/:id
+// @desc    Unfollow a user
+// @access  Private
+router.put("/unfollow/:id", auth, async (req, res) => {
+  try {
+    const userToUnfollow = await User.findById(req.params.id);
+    const currentUser = await User.findById(req.user.id);
+
+    if (!userToUnfollow) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+
+    // Get remove index for current user's following
+    const removeIndexFollowing = currentUser.following
+      .map((follow) => follow.user.toString())
+      .indexOf(req.params.id);
+
+    // Get remove index for userToUnfollow's followers
+    const removeIndexFollowers = userToUnfollow.followers
+      .map((follow) => follow.user.toString())
+      .indexOf(req.user.id);
+
+    if (removeIndexFollowing === -1 || removeIndexFollowers === -1) {
+      return res.status(400).json({ msg: "User has not been followed yet" });
+    }
+
+    // Splice them out of the array
+    currentUser.following.splice(removeIndexFollowing, 1);
+    userToUnfollow.followers.splice(removeIndexFollowers, 1);
+
+    // Save users
+    await currentUser.save();
+    await userToUnfollow.save();
+
+    res.json(userToUnfollow.followers);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server error");
+  }
+});
+
+// @route   GET api/users/followers/:id
+// @desc    Get followers of a user
+// @access  Public
+router.get("/followers/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).populate("followers.user", [
+      "name",
+    ]);
+    res.json(user.followers);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server error");
+  }
+});
+
+// @route   GET api/users/following/:id
+// @desc    Get users that a user is following
+// @access  Public
+router.get("/following/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).populate("following.user", [
+      "name",
+    ]);
+    res.json(user.following);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server error");
