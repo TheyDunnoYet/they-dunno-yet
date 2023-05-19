@@ -51,7 +51,8 @@ export const getCurrentUser = () => (dispatch) => {
   const token = localStorage.getItem("jwtToken");
   fetchCurrentUser(token)
     .then((res) => {
-      dispatch(setCurrentUser(res.data));
+      console.log("User data: ", res); // Add this line
+      dispatch(setCurrentUser(res));
     })
     .catch((err) =>
       dispatch({
@@ -74,4 +75,12 @@ export const setUserLoading = () => {
   return {
     type: USER_LOADING,
   };
+};
+
+// Log user out
+export const logout = () => (dispatch) => {
+  // Remove token from local storage
+  localStorage.removeItem("jwtToken");
+  // Remove the user object from the Redux store
+  dispatch(setCurrentUser({}));
 };
