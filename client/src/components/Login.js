@@ -1,15 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { login } from "../redux/actions/authActions";
+import { clearErrors } from "../redux/actions/errorActions";
 import { useNavigate } from "react-router-dom";
+import { TextField, Button } from "@material-ui/core";
 
-function Login({ login }) {
+function Login({ login, clearErrors, error = {} }) {
   let navigate = useNavigate();
 
   const [userData, setUserData] = useState({
     email: "",
     password: "",
   });
+
+  useEffect(() => {
+    return () => {
+      clearErrors(); // Clear errors when the component is unmounted
+    };
+  }, [clearErrors]);
 
   const handleChange = (event) => {
     setUserData({
@@ -24,7 +32,7 @@ function Login({ login }) {
       .then(() => {
         navigate("/"); // redirect user after login
       })
-      .catch((error) => {
+      .catch((err) => {
         // handle error
       });
   };
@@ -33,26 +41,34 @@ function Login({ login }) {
     <div>
       <h1>Login</h1>
       <form onSubmit={handleSubmit}>
-        <input
+        <TextField
           type="email"
           name="email"
           value={userData.email}
           onChange={handleChange}
-          placeholder="Email"
+          label="Email"
           required
+          error={!!error.email}
+          helperText={error.email}
         />
-        <input
+        <TextField
           type="password"
           name="password"
           value={userData.password}
           onChange={handleChange}
-          placeholder="Password"
+          label="Password"
           required
+          error={!!error.password}
+          helperText={error.password}
         />
-        <button type="submit">Login</button>
+        <Button type="submit">Login</Button>
       </form>
     </div>
   );
 }
 
-export default connect(null, { login })(Login);
+const mapStateToProps = (state) => ({
+  error: state.error || {},
+});
+
+export default connect(mapStateToProps, { login, clearErrors })(Login);

@@ -51,7 +51,7 @@ export const getCurrentUser = () => (dispatch) => {
   const token = localStorage.getItem("jwtToken");
   fetchCurrentUser(token)
     .then((res) => {
-      console.log("User data: ", res); // Add this line
+      // console.log("User data: ", res);
       dispatch(setCurrentUser(res));
     })
     .catch((err) =>
