@@ -3,8 +3,17 @@ import { connect } from "react-redux";
 import { login } from "../redux/actions/authActions";
 import { clearErrors } from "../redux/actions/errorActions";
 import { useNavigate } from "react-router-dom";
-import { TextField, Button, Container, Box, Snackbar } from "@material-ui/core";
+import {
+  TextField,
+  Button,
+  Container,
+  Box,
+  Snackbar,
+  IconButton,
+  InputAdornment,
+} from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
+import { Visibility, VisibilityOff } from "@material-ui/icons";
 
 function Login({ login, clearErrors, error = {}, isAuthenticated }) {
   let navigate = useNavigate();
@@ -26,6 +35,7 @@ function Login({ login, clearErrors, error = {}, isAuthenticated }) {
 
   const [snackbarOpen, setSnackbarOpen] = useState(false); // For Snackbar
   const [errorSnackbarOpen, setErrorSnackbarOpen] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (error && error.id === "LOGIN_FAIL") {
@@ -115,6 +125,7 @@ function Login({ login, clearErrors, error = {}, isAuthenticated }) {
         <h1 style={{ textAlign: "center" }}>Login</h1>
         <form onSubmit={handleSubmit} noValidate>
           <TextField
+            autoFocus
             type="email"
             name="email"
             value={userData.email}
@@ -125,7 +136,7 @@ function Login({ login, clearErrors, error = {}, isAuthenticated }) {
             fullWidth
           />
           <TextField
-            type="password"
+            type={showPassword ? "text" : "password"}
             name="password"
             value={userData.password}
             onChange={handlePasswordChange}
@@ -133,6 +144,18 @@ function Login({ login, clearErrors, error = {}, isAuthenticated }) {
             error={!!(formErrors.password || localErrors.password)}
             helperText={formErrors.password || localErrors.password}
             fullWidth
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    edge="end"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
           <Button type="submit" color="primary" variant="contained" fullWidth>
             Login
