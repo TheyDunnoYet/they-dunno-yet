@@ -1,12 +1,19 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AppBar, Toolbar, Typography, Button } from "@material-ui/core";
 import { connect } from "react-redux";
 import { logout } from "../redux/actions/authActions";
 
 const NavBar = ({ auth: { isAuthenticated }, logout }) => {
+  let navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
+
   const authLinks = (
-    <Button color="inherit" onClick={logout}>
+    <Button color="inherit" onClick={handleLogout}>
       Logout
     </Button>
   );
