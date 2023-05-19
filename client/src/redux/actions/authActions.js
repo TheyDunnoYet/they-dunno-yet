@@ -6,13 +6,17 @@ export const USER_LOADING = "USER_LOADING";
 export const GET_ERRORS = "GET_ERRORS";
 
 // Login User
-export const login = (userData) => (dispatch) => {
+// Login User
+export const login = (userData, stayLogged) => (dispatch) => {
   return new Promise((resolve, reject) => {
     loginUser(userData)
       .then((res) => {
         const { token } = res;
-        // Save to localStorage
-        localStorage.setItem("jwtToken", token);
+        if (stayLogged) {
+          localStorage.setItem("jwtToken", token); // Store the token permanently in localStorage
+        } else {
+          sessionStorage.setItem("jwtToken", token); // Store the token temporarily in sessionStorage
+        }
         // Fetch the current user
         dispatch(getCurrentUser());
         resolve(res);
@@ -46,12 +50,13 @@ export const register = (userData) => (dispatch) => {
 };
 
 // Get Current User
+// Check both localStorage and sessionStorage for a token
 export const getCurrentUser = () => (dispatch) => {
   dispatch(setUserLoading());
-  const token = localStorage.getItem("jwtToken");
+  const token =
+    localStorage.getItem("jwtToken") || sessionStorage.getItem("jwtToken");
   fetchCurrentUser(token)
     .then((res) => {
-      // console.log("User data: ", res);
       dispatch(setCurrentUser(res));
     })
     .catch((err) =>
@@ -81,6 +86,7 @@ export const setUserLoading = () => {
 export const logout = () => (dispatch) => {
   // Remove token from local storage
   localStorage.removeItem("jwtToken");
+  sessionStorage.removeItem("jwtToken"); // Remove token from session storage
   // Remove the user object from the Redux store
   dispatch(setCurrentUser({}));
 };

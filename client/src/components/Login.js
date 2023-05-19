@@ -11,6 +11,8 @@ import {
   Snackbar,
   IconButton,
   InputAdornment,
+  Checkbox,
+  FormControlLabel,
 } from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
 import { Visibility, VisibilityOff } from "@material-ui/icons";
@@ -36,6 +38,7 @@ function Login({ login, clearErrors, error = {}, isAuthenticated }) {
   const [snackbarOpen, setSnackbarOpen] = useState(false); // For Snackbar
   const [errorSnackbarOpen, setErrorSnackbarOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [stayLogged, setStayLogged] = useState(false);
 
   useEffect(() => {
     if (error && error.id === "LOGIN_FAIL") {
@@ -103,7 +106,8 @@ function Login({ login, clearErrors, error = {}, isAuthenticated }) {
     }
 
     // Attempt to login
-    login(userData).catch((err) => {
+    login(userData, stayLogged).catch((err) => {
+      // Pass stayLogged to login
       if (err.response && err.response.status === 400) {
         setErrorSnackbarOpen(true); // Open the error Snackbar
         setFormErrors({
@@ -156,6 +160,17 @@ function Login({ login, clearErrors, error = {}, isAuthenticated }) {
                 </InputAdornment>
               ),
             }}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={stayLogged}
+                onChange={(e) => setStayLogged(e.target.checked)}
+                name="stayLogged"
+                color="primary"
+              />
+            }
+            label="Keep me logged in"
           />
           <Button type="submit" color="primary" variant="contained" fullWidth>
             Login
