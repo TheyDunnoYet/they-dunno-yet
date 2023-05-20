@@ -1,9 +1,12 @@
 import React from "react";
+import Product from "./Product"; // Make sure to create this component.
 
-const ProductsPage = () => {
+const ProductsPage = ({ products }) => {
   return (
-    <div>
-      <h1>Products</h1>
+    <div className="products-page">
+      {products.map((product) => (
+        <Product key={product._id} product={product} />
+      ))}
     </div>
   );
 };
