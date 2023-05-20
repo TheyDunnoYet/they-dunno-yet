@@ -1,8 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addProduct } from "../redux/actions/productActions";
+import { clearErrors } from "../redux/actions/errorActions";
+import { fetchAllTopics } from "../api/topic";
 import { makeStyles } from "@material-ui/core/styles";
-import { Button, TextField, Snackbar } from "@material-ui/core";
+import {
+  Button,
+  TextField,
+  Snackbar,
+  Grid,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
 
 // Alert component from material UI
@@ -20,27 +31,58 @@ const useStyles = makeStyles((theme) => ({
 
 const ProductForm = () => {
   const dispatch = useDispatch();
-  const errors = useSelector((state) => state.errors);
+  const { topics } = useSelector((state) => state.topic);
+  const { user } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    dispatch(fetchAllTopics());
+  }, [dispatch]);
+
+  const { productErrors } = useSelector((state) => state.errors);
 
   const classes = useStyles();
   const [open, setOpen] = useState(false);
 
   const [product, setProduct] = useState({
-    name: "",
-    price: "",
+    images: [""],
+    title: "",
+    tagline: "",
     description: "",
+    tags: [""],
+    url: "",
+    dropDate: "",
   });
 
   const handleChange = (e) => {
-    setProduct({ ...product, [e.target.name]: e.target.value });
+    if (e.target.name === "images") {
+      let imageArray = e.target.value
+        ? e.target.value.split(",").map((item) => item.trim())
+        : [""];
+      setProduct({ ...product, [e.target.name]: imageArray });
+    } else {
+      setProduct({ ...product, [e.target.name]: e.target.value });
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(addProduct(product))
+    dispatch(clearErrors());
+    let finalProduct = {
+      ...product,
+      images: product.images.split(",").map((item) => item.trim()),
+    };
+    dispatch(addProduct(finalProduct))
       .then(() => {
         setOpen(true);
-        setProduct({ name: "", price: "", description: "" });
+        setProduct({
+          images: [""],
+          title: "",
+          tagline: "",
+          description: "",
+          tags: [""],
+          url: "",
+          dropDate: "",
+        });
       })
       .catch((err) => console.log(err));
   };
@@ -54,43 +96,97 @@ const ProductForm = () => {
 
   return (
     <div className={classes.root}>
-      <form onSubmit={handleSubmit}>
-        <TextField
-          name="name"
-          value={product.name}
-          onChange={handleChange}
-          label="Product Name"
-          variant="outlined"
-        />
-        <TextField
-          name="price"
-          value={product.price}
-          onChange={handleChange}
-          label="Product Price"
-          variant="outlined"
-        />
-        <TextField
-          name="description"
-          value={product.description}
-          onChange={handleChange}
-          label="Product Description"
-          variant="outlined"
-        />
+      <Grid container justifyContent="center">
+        <Grid item xs={12} sm={8} md={6}>
+          <form onSubmit={handleSubmit}>
+            <TextField
+              name="images"
+              value={product.images[0]}
+              onChange={handleChange}
+              label="Product Images"
+              variant="outlined"
+              fullWidth
+            />
+            <TextField
+              name="title"
+              value={product.title}
+              onChange={handleChange}
+              label="Product Title"
+              variant="outlined"
+              fullWidth
+            />
+            <TextField
+              name="tagline"
+              value={product.tagline}
+              onChange={handleChange}
+              label="Product Tagline"
+              variant="outlined"
+              fullWidth
+            />
+            <TextField
+              name="description"
+              value={product.description}
+              onChange={handleChange}
+              label="Product Description"
+              variant="outlined"
+              fullWidth
+            />
+            <TextField
+              name="tags"
+              value={product.tags[0]}
+              onChange={handleChange}
+              label="Product Tags"
+              variant="outlined"
+              fullWidth
+            />
+            <TextField
+              name="url"
+              value={product.url}
+              onChange={handleChange}
+              label="Product URL"
+              variant="outlined"
+              fullWidth
+            />
+            <TextField
+              name="dropDate"
+              value={product.dropDate}
+              onChange={handleChange}
+              label="Product Drop Date"
+              variant="outlined"
+              fullWidth
+              type="date"
+              InputLabelProps={{ shrink: true }}
+            />
+            <FormControl className={classes.formControl}>
+              <InputLabel id="demo-simple-select-label">Topic</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={product.topic}
+                onChange={handleChange}
+                name="topic"
+              >
+                {topics.map((topic) => (
+                  <MenuItem value={topic._id} key={topic._id}>
+                    {topic.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <Button type="submit" variant="contained" color="primary">
+              Create Product
+            </Button>
+          </form>
 
-        <Button type="submit" variant="contained" color="primary">
-          Create Product
-        </Button>
-      </form>
+          <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+            <Alert onClose={handleClose} severity="success">
+              The product has been created successfully!
+            </Alert>
+          </Snackbar>
 
-      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
-        <Alert onClose={handleClose} severity="success">
-          The product has been created successfully!
-        </Alert>
-      </Snackbar>
-
-      {errors.id === "CREATE_PRODUCT_FAIL" && (
-        <Alert severity="error">{errors.msg}</Alert>
-      )}
+          {productErrors && <Alert severity="error">{productErrors.msg}</Alert>}
+        </Grid>
+      </Grid>
     </div>
   );
 };
