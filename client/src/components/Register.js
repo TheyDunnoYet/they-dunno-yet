@@ -87,6 +87,69 @@ function Register({ register, clearErrors, error, isAuthenticated }) {
     });
   };
 
+  const handleNameChange = (event) => {
+    const newName = event.target.value;
+    setUserData({ ...userData, name: newName });
+
+    if (!newName.trim()) {
+      setLocalErrors((errors) => ({
+        ...errors,
+        name: "Name is required",
+      }));
+    } else {
+      setLocalErrors((errors) => ({
+        ...errors,
+        name: "",
+      }));
+    }
+  };
+
+  const handleEmailChange = (event) => {
+    const newEmail = event.target.value;
+    setUserData({ ...userData, email: newEmail });
+
+    if (!newEmail.trim() || !isValidEmail(newEmail)) {
+      setLocalErrors((errors) => ({
+        ...errors,
+        email: "Please enter a valid email.",
+      }));
+    } else {
+      setLocalErrors((errors) => ({
+        ...errors,
+        email: "",
+      }));
+    }
+  };
+
+  const handlePasswordChange = (event) => {
+    const newPassword = event.target.value;
+    setUserData({ ...userData, password: newPassword });
+
+    const passwordValidationError = validatePassword(newPassword);
+
+    if (passwordValidationError) {
+      setLocalErrors((errors) => ({
+        ...errors,
+        password: passwordValidationError,
+      }));
+    } else {
+      setLocalErrors((errors) => ({
+        ...errors,
+        password: "",
+      }));
+    }
+  };
+
+  const validatePassword = (password) => {
+    const passwordRegex =
+      /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^\w\d\s:])([^\s]){8,}$/;
+    if (!password.trim() || !passwordRegex.test(password)) {
+      return "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character";
+    } else {
+      return "";
+    }
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
 
@@ -176,7 +239,7 @@ function Register({ register, clearErrors, error, isAuthenticated }) {
             type="text"
             name="name"
             value={userData.name}
-            onChange={handleChange}
+            onChange={handleNameChange}
             label="Name"
             error={!!(formErrors.name || localErrors.name)}
             helperText={formErrors.name || localErrors.name}
@@ -186,7 +249,7 @@ function Register({ register, clearErrors, error, isAuthenticated }) {
             type="email"
             name="email"
             value={userData.email}
-            onChange={handleChange}
+            onChange={handleEmailChange}
             label="Email"
             error={!!(formErrors.email || localErrors.email)}
             helperText={formErrors.email || localErrors.email}
@@ -196,7 +259,7 @@ function Register({ register, clearErrors, error, isAuthenticated }) {
             type={showPassword ? "text" : "password"}
             name="password"
             value={userData.password}
-            onChange={handleChange}
+            onChange={handlePasswordChange}
             label="Password"
             error={!!(formErrors.password || localErrors.password)}
             helperText={formErrors.password || localErrors.password}
