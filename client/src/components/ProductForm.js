@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addProduct } from "../redux/actions/productActions";
 import { clearErrors } from "../redux/actions/errorActions";
-import { fetchAllTopics } from "../api/topic";
+import { getTopics } from "../redux/actions/topicActions";
+
 import { makeStyles } from "@material-ui/core/styles";
 import {
   Button,
@@ -35,7 +36,7 @@ const ProductForm = () => {
   const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    dispatch(fetchAllTopics());
+    dispatch(getTopics());
   }, [dispatch]);
 
   const { productErrors } = useSelector((state) => state.errors);
@@ -51,6 +52,7 @@ const ProductForm = () => {
     tags: [""],
     url: "",
     dropDate: "",
+    topic: "", // initialize topic with an empty string
   });
 
   const handleChange = (e) => {
@@ -69,7 +71,8 @@ const ProductForm = () => {
     dispatch(clearErrors());
     let finalProduct = {
       ...product,
-      images: product.images.split(",").map((item) => item.trim()),
+      // images: product.images.split(",").map((item) => item.trim()), // no need to split and trim again
+      images: product.images.map((item) => item.trim()),
     };
     dispatch(addProduct(finalProduct))
       .then(() => {
@@ -82,6 +85,7 @@ const ProductForm = () => {
           tags: [""],
           url: "",
           dropDate: "",
+          topic: "",
         });
       })
       .catch((err) => console.log(err));
@@ -157,7 +161,7 @@ const ProductForm = () => {
               type="date"
               InputLabelProps={{ shrink: true }}
             />
-            <FormControl className={classes.formControl}>
+            <FormControl fullWidth className={classes.formControl}>
               <InputLabel id="demo-simple-select-label">Topic</InputLabel>
               <Select
                 labelId="demo-simple-select-label"
