@@ -112,8 +112,14 @@ function Login({ login, clearErrors, error = {}, isAuthenticated }) {
         setErrorSnackbarOpen(true); // Open the error Snackbar
         setFormErrors({
           ...formErrors,
-          email: "This user doesn't exist. Please try again.",
-          password: "This user doesn't exist. Please try again.",
+          email:
+            err.response.data.msg === "Invalid email"
+              ? "Invalid email. Please try again."
+              : "",
+          password:
+            err.response.data.msg === "Invalid password"
+              ? "Invalid password. Please try again."
+              : "",
         });
       }
     });
