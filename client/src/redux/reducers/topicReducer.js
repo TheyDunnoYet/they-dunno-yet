@@ -6,8 +6,6 @@ const initialState = {
 };
 
 const topicReducer = (state = initialState, action) => {
-  console.log("Received action in topicReducer:", action);
-
   switch (action.type) {
     case GET_TOPICS:
       return {

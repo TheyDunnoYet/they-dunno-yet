@@ -4,6 +4,7 @@ import React from "react";
 import FeedForm from "./FeedForm";
 import TopicForm from "./TopicForm";
 import FeedTopicList from "./FeedTopicList";
+import ProductForm from "./ProductForm";
 
 const HomePage = () => {
   return (
@@ -14,6 +15,7 @@ const HomePage = () => {
       <FeedForm />
       <TopicForm />
       <FeedTopicList />
+      <ProductForm />
     </div>
   );
 };

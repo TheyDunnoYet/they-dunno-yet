@@ -8,7 +8,6 @@ export const getTopics = () => async (dispatch) => {
   dispatch(setTopicsLoading());
   try {
     const data = await api.fetchAllTopics();
-    console.log("Data before dispatching GET_TOPICS:", data);
     dispatch({ type: GET_TOPICS, payload: data });
   } catch (error) {
     console.error("Error:", error);

@@ -16,8 +16,6 @@ import Alert from "@material-ui/lab/Alert";
 import { Visibility, VisibilityOff } from "@material-ui/icons";
 
 function Register({ register, clearErrors, error, isAuthenticated }) {
-  console.log("Register Component Error:", error);
-
   const navigate = useNavigate();
   const [userData, setUserData] = useState({
     name: "",
@@ -47,9 +45,7 @@ function Register({ register, clearErrors, error, isAuthenticated }) {
 
   useEffect(() => {
     console.log("Error:", JSON.stringify(error));
-    console.log("Register.js error: ", error);
     if (error && error.id === "REGISTER_FAIL") {
-      console.log("Setting Snackbar to open.");
       setFormErrors((prevErrors) => ({
         ...prevErrors,
         email: error.msg,

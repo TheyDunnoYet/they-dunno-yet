@@ -40,7 +40,6 @@ export const register = (userData) => (dispatch) => {
       dispatch(getCurrentUser());
     })
     .catch((err) => {
-      console.log("authActions.js error: ", err.response.data);
       dispatch({
         type: GET_ERRORS,
         payload: {
