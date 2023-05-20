@@ -6,9 +6,12 @@ const BASE_URL = "http://localhost:5001/api/auth";
 const API = axios.create({ baseURL: BASE_URL });
 
 // Send a POST request to the login endpoint with user credentials
-export const loginUser = async (userCredentials) => {
+export const loginUser = async (userCredentials, stayLogged) => {
   try {
-    const { data } = await API.post("/login", userCredentials);
+    const { data } = await API.post("/login", {
+      ...userCredentials,
+      stayLogged,
+    });
     return data;
   } catch (error) {
     throw error;

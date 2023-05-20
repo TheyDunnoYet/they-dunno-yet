@@ -3,10 +3,21 @@ import { connect } from "react-redux";
 import { register } from "../redux/actions/authActions";
 import { clearErrors } from "../redux/actions/errorActions";
 import { useNavigate } from "react-router-dom";
-import { TextField, Button, Container, Box, Snackbar } from "@material-ui/core";
+import {
+  TextField,
+  Button,
+  Container,
+  Box,
+  Snackbar,
+  IconButton,
+  InputAdornment,
+} from "@material-ui/core";
 import Alert from "@material-ui/lab/Alert";
+import { Visibility, VisibilityOff } from "@material-ui/icons";
 
 function Register({ register, clearErrors, error, isAuthenticated }) {
+  console.log("Register Component Error:", error);
+
   const navigate = useNavigate();
   const [userData, setUserData] = useState({
     name: "",
@@ -31,20 +42,26 @@ function Register({ register, clearErrors, error, isAuthenticated }) {
   });
 
   const [snackbarOpen, setSnackbarOpen] = useState(false); // For Snackbar
+  const [showPassword, setShowPassword] = useState(false);
+  const [errorSnackbarOpen, setErrorSnackbarOpen] = useState(false); // for register fail
 
   useEffect(() => {
+    console.log("Error:", JSON.stringify(error));
+    console.log("Register.js error: ", error);
     if (error && error.id === "REGISTER_FAIL") {
-      setFormErrors({
-        name: error.msg.name,
-        email: error.msg.email,
-        password: error.msg.password,
-      });
+      console.log("Setting Snackbar to open.");
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        email: error.msg,
+      }));
+      setErrorSnackbarOpen(true);
     } else {
       setFormErrors({
         name: "",
         email: "",
         password: "",
       });
+      setErrorSnackbarOpen(false);
     }
   }, [error]);
 
@@ -84,7 +101,7 @@ function Register({ register, clearErrors, error, isAuthenticated }) {
       return;
     }
 
-    if (!userData.email.trim()) {
+    if (!userData.email.trim() || !isValidEmail(userData.email)) {
       setLocalErrors((errors) => ({
         ...errors,
         email: "Please enter a valid email.",
@@ -121,8 +138,18 @@ function Register({ register, clearErrors, error, isAuthenticated }) {
     register(userData);
   };
 
+  const isValidEmail = (email) => {
+    const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return re.test(email);
+  };
+
   const handleClose = () => {
     setSnackbarOpen(false);
+  };
+
+  const handleErrorClose = () => {
+    setErrorSnackbarOpen(false);
+    clearErrors();
   };
 
   return (
@@ -131,6 +158,7 @@ function Register({ register, clearErrors, error, isAuthenticated }) {
         <h1 style={{ textAlign: "center" }}>Register</h1>
         <form onSubmit={handleSubmit}>
           <TextField
+            autoFocus
             type="text"
             name="name"
             value={userData.name}
@@ -151,7 +179,7 @@ function Register({ register, clearErrors, error, isAuthenticated }) {
             fullWidth
           />
           <TextField
-            type="password"
+            type={showPassword ? "text" : "password"}
             name="password"
             value={userData.password}
             onChange={handleChange}
@@ -159,6 +187,18 @@ function Register({ register, clearErrors, error, isAuthenticated }) {
             error={!!(formErrors.password || localErrors.password)}
             helperText={formErrors.password || localErrors.password}
             fullWidth
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    edge="end"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
           <TextField
             type="password"
@@ -188,13 +228,27 @@ function Register({ register, clearErrors, error, isAuthenticated }) {
             Your registration is complete!
           </Alert>
         </Snackbar>
+        <Snackbar
+          open={errorSnackbarOpen}
+          autoHideDuration={6000}
+          onClose={handleErrorClose}
+        >
+          <Alert
+            onClose={handleErrorClose}
+            severity="error"
+            elevation={6}
+            variant="filled"
+          >
+            {error && error.msg ? error.msg : "Test error message"}
+          </Alert>
+        </Snackbar>
       </Box>
     </Container>
   );
 }
 
 const mapStateToProps = (state) => ({
-  error: state.error,
+  error: state.errors,
   isAuthenticated: state.auth.isAuthenticated,
 });
 

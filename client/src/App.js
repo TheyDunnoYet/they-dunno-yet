@@ -13,7 +13,10 @@ function App() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (localStorage.getItem("jwtToken")) {
+    if (
+      localStorage.getItem("jwtToken") ||
+      sessionStorage.getItem("jwtToken")
+    ) {
       dispatch(getCurrentUser());
     }
   }, [dispatch]);

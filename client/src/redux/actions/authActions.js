@@ -4,12 +4,12 @@ import { loginUser, registerUser, fetchCurrentUser } from "../../api/auth";
 export const SET_CURRENT_USER = "SET_CURRENT_USER";
 export const USER_LOADING = "USER_LOADING";
 export const GET_ERRORS = "GET_ERRORS";
+export const REGISTER_FAIL = "REGISTER_FAIL";
 
-// Login User
 // Login User
 export const login = (userData, stayLogged) => (dispatch) => {
   return new Promise((resolve, reject) => {
-    loginUser(userData)
+    loginUser(userData, stayLogged)
       .then((res) => {
         const { token } = res;
         if (stayLogged) {
@@ -36,17 +36,19 @@ export const register = (userData) => (dispatch) => {
   registerUser(userData)
     .then((res) => {
       const { token } = res;
-      // Save to localStorage
       localStorage.setItem("jwtToken", token);
-      // Fetch the current user
       dispatch(getCurrentUser());
     })
-    .catch((err) =>
+    .catch((err) => {
+      console.log("authActions.js error: ", err.response.data);
       dispatch({
         type: GET_ERRORS,
-        payload: err.response.data,
-      })
-    );
+        payload: {
+          id: "REGISTER_FAIL",
+          msg: err.response.data.msg || "Something went wrong",
+        },
+      });
+    });
 };
 
 // Get Current User

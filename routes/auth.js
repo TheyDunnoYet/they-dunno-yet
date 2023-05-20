@@ -92,20 +92,16 @@ router.post(
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { email, password } = req.body;
+    const { email, password, stayLogged } = req.body;
 
     try {
       let user = await User.findOne({ email });
-
-      // console.log("User:", user);
 
       if (!user) {
         return res.status(400).json({ msg: "Invalid Credentials" });
       }
 
       const isMatch = await bcrypt.compare(password, user.password);
-
-      // console.log("isMatch:", isMatch);
 
       if (!isMatch) {
         return res.status(400).json({ msg: "Invalid Credentials" });
@@ -117,11 +113,13 @@ router.post(
         },
       };
 
+      const expiresIn = stayLogged ? "30d" : "24h"; // 30 days if stayLogged is true, 24 hours otherwise
+
       jwt.sign(
         payload,
         config.get("jwtSecret"),
         {
-          expiresIn: 3600,
+          expiresIn,
         },
         (err, token) => {
           if (err) throw err;

@@ -3,15 +3,21 @@
         /public
         /src
             /api
-                auth.js (  )
+                auth.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/client/src/api/auth.js )
             /components
                 AboutPage.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/client/src/components/AboutPage.js )
                 HomePage.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/client/src/components/HomePage.js )
+                Login.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/client/src/components/Login.js )
                 NavBar.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/client/src/components/NavBar.js )
                 ProductsPage.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/client/src/components/ProductsPage.js )
+                Register.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/client/src/components/Register.js )
             /redux
                 /actions
+                    authActions.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/client/src/redux/actions/authActions.js )
+                    errorActions.js (  )
                 /reducers
+                    authReducer.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/client/src/redux/reducers/authReducer.js )
+                    errorReducer.js (  )
                     index.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/client/src/redux/reducers/index.js )
                 store.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/client/src/redux/store.js )
             App.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/client/src/App.js )
