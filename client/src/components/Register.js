@@ -109,18 +109,26 @@ function Register({ register, clearErrors, error, isAuthenticated }) {
       return;
     }
 
-    if (!userData.password.trim()) {
+    // Check if password is valid
+    const passwordRegex =
+      /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^\w\d\s:])([^\s]){8,}$/;
+    if (!userData.password.trim() || !passwordRegex.test(userData.password)) {
       setLocalErrors((errors) => ({
         ...errors,
-        password: "Please enter a password.",
+        password:
+          "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character",
       }));
       return;
     }
 
-    if (!userData.password2.trim()) {
+    // Check if password2 is valid and matches password
+    if (
+      !userData.password2.trim() ||
+      userData.password !== userData.password2
+    ) {
       setLocalErrors((errors) => ({
         ...errors,
-        password2: "Please confirm your password.",
+        password2: "Passwords do not match",
       }));
       return;
     }

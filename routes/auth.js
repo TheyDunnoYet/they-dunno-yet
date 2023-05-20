@@ -23,8 +23,8 @@ router.post(
     }),
     check(
       "password",
-      "Please enter a password with 6 or more characters"
-    ).isLength({ min: 6 }),
+      "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character"
+    ).matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^\w\d\s:])([^\s]){8,}$/),
   ],
   async (req, res) => {
     const errors = validationResult(req);
