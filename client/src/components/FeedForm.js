@@ -1,11 +1,17 @@
 import React, { useState } from "react";
 import { createFeed } from "../api/feed";
 import { connect } from "react-redux";
-import { Button, TextField, Grid, Paper } from "@material-ui/core";
+import { Button, TextField, Grid, Paper, Snackbar } from "@material-ui/core";
+import MuiAlert from "@material-ui/lab/Alert"; // Import Alert component
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 function FeedForm({ user }) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [openSnackbar, setOpenSnackbar] = useState(false); // Add state for Snackbar
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -14,11 +20,20 @@ function FeedForm({ user }) {
         await createFeed({ name, description });
         setName("");
         setDescription("");
+        setOpenSnackbar(true); // Open Snackbar on successful feed creation
       } catch (error) {
         console.error("Error:", error);
         console.error("Error Details:", error.response.data);
       }
     }
+  };
+
+  // Handle Snackbar close
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpenSnackbar(false);
   };
 
   if (user && user.role === "Admin") {
@@ -50,6 +65,16 @@ function FeedForm({ user }) {
             </form>
           </Paper>
         </Grid>
+
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={6000}
+          onClose={handleCloseSnackbar}
+        >
+          <Alert onClose={handleCloseSnackbar} severity="success">
+            The Feed has been successfully created!
+          </Alert>
+        </Snackbar>
       </Grid>
     );
   } else {

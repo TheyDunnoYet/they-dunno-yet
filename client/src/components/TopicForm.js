@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { createTopic } from "../api/topic";
+import { createTopic } from "../redux/actions/topicActions";
 import { connect } from "react-redux";
 import {
   Button,
@@ -10,18 +10,26 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Snackbar,
 } from "@material-ui/core";
+import MuiAlert from "@material-ui/lab/Alert";
 
-function TopicForm({ user, feeds }) {
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
+function TopicForm({ user, feeds, createTopic }) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [feed, setFeed] = useState("");
+  const [open, setOpen] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (user && user.role === "Admin" && feed !== "") {
       try {
         await createTopic({ name, description, feed });
+        setOpen(true); // Open Snackbar
         setName("");
         setDescription("");
         setFeed("");
@@ -31,6 +39,13 @@ function TopicForm({ user, feeds }) {
     } else if (feed === "") {
       console.error("No feed selected");
     }
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen(false);
   };
 
   if (user && user.role === "Admin") {
@@ -75,6 +90,12 @@ function TopicForm({ user, feeds }) {
             </form>
           </Paper>
         </Grid>
+
+        <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+          <Alert onClose={handleClose} severity="success">
+            The Topic has been successfully created!
+          </Alert>
+        </Snackbar>
       </Grid>
     );
   } else {
@@ -87,4 +108,4 @@ const mapStateToProps = (state) => ({
   feeds: state.feed.feeds,
 });
 
-export default connect(mapStateToProps)(TopicForm);
+export default connect(mapStateToProps, { createTopic })(TopicForm);
