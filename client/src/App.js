@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { getCurrentUser } from "./redux/actions/authActions";
+import { getFeeds } from "./redux/actions/feedActions"; // Import getFeeds
 import NavBar from "./components/NavBar";
 import HomePage from "./components/HomePage";
 import AboutPage from "./components/AboutPage";
@@ -18,6 +19,7 @@ function App() {
       sessionStorage.getItem("jwtToken")
     ) {
       dispatch(getCurrentUser());
+      dispatch(getFeeds()); // Dispatch getFeeds
     }
   }, [dispatch]);
 
