@@ -66,12 +66,18 @@ function Register({ register, clearErrors, error, isAuthenticated }) {
   }, [error]);
 
   useEffect(() => {
+    let timeoutId;
+
     if (isAuthenticated) {
       setSnackbarOpen(true);
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         navigate("/");
       }, 2000);
     }
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
   }, [isAuthenticated, navigate]);
 
   const handleChange = (event) => {

@@ -51,12 +51,18 @@ function Login({ login, clearErrors, error = {}, isAuthenticated }) {
   }, [error, clearErrors]);
 
   useEffect(() => {
+    let timeoutId;
+
     if (isAuthenticated) {
       setSnackbarOpen(true);
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         navigate("/");
       }, 2000);
     }
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
   }, [isAuthenticated, navigate]);
 
   const handleEmailChange = (event) => {
