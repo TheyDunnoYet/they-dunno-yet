@@ -22,6 +22,15 @@ export const fetchTopic = async (topicId) => {
   }
 };
 
+export const fetchAllTopics = async () => {
+  try {
+    const { data } = await API.get("/");
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const createTopic = async (topic) => {
   try {
     const { data } = await API.post("/", topic);

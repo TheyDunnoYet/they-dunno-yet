@@ -3,6 +3,7 @@ import React from "react";
 // import Topic from "./Topic";
 import FeedForm from "./FeedForm";
 import TopicForm from "./TopicForm";
+import FeedTopicList from "./FeedTopicList";
 
 const HomePage = () => {
   return (
@@ -12,6 +13,7 @@ const HomePage = () => {
       <Topic topicId="64663196ff7289dc14daf6cb" /> */}
       <FeedForm />
       <TopicForm />
+      <FeedTopicList />
     </div>
   );
 };

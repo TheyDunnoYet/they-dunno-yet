@@ -6,7 +6,7 @@ export const FEEDS_LOADING = "FEEDS_LOADING";
 // Get Feeds
 export const getFeeds = () => (dispatch) => {
   dispatch(setFeedsLoading());
-  fetchAllFeeds() // Use fetchAllFeeds here
+  fetchAllFeeds()
     .then((feeds) =>
       dispatch({
         type: GET_FEEDS,
