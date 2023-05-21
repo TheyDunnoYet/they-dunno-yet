@@ -10,15 +10,17 @@ function Alert(props) {
 
 function TagForm({ user }) {
   const [name, setName] = useState("");
-  const [openSnackbar, setOpenSnackbar] = useState(false); // Add state for Snackbar
+  const [acronym, setAcronym] = useState("");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (user && user.role === "Admin") {
       try {
-        await createTag({ name });
+        await createTag({ name, acronym });
         setName("");
-        setOpenSnackbar(true); // Open Snackbar on successful tag creation
+        setAcronym("");
+        setOpenSnackbar(true);
       } catch (error) {
         console.error("Error:", error);
         console.error("Error Details:", error.response.data);
@@ -45,6 +47,14 @@ function TagForm({ user }) {
                 label="Name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                required
+                fullWidth
+                margin="normal"
+              />
+              <TextField
+                label="Acronym"
+                value={acronym}
+                onChange={(e) => setAcronym(e.target.value)}
                 required
                 fullWidth
                 margin="normal"

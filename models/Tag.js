@@ -6,6 +6,11 @@ const TagSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  acronym: {
+    type: String,
+    required: true,
+    unique: true,
+  },
 });
 
 module.exports = mongoose.model("Tag", TagSchema);

@@ -12,18 +12,22 @@ router.post(
   "/",
   auth,
   admin,
-  [check("name", "Name is required").not().isEmpty()],
+  [
+    check("name", "Name is required").not().isEmpty(),
+    check("acronym", "Acronym is required").not().isEmpty(),
+  ],
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { name } = req.body;
+    const { name, acronym } = req.body;
 
     try {
       const newTag = new Tag({
         name,
+        acronym,
       });
 
       const tag = await newTag.save();
