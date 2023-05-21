@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { createFeed } from "../api/feed";
+import { createTag } from "../api/tag";
 import { connect } from "react-redux";
 import { Button, TextField, Grid, Paper, Snackbar } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
@@ -8,19 +8,17 @@ function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
-function FeedForm({ user }) {
+function TagForm({ user }) {
   const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false); // Add state for Snackbar
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (user && user.role === "Admin") {
       try {
-        await createFeed({ name, description });
+        await createTag({ name });
         setName("");
-        setDescription("");
-        setOpenSnackbar(true); // Open Snackbar on successful feed creation
+        setOpenSnackbar(true); // Open Snackbar on successful tag creation
       } catch (error) {
         console.error("Error:", error);
         console.error("Error Details:", error.response.data);
@@ -39,6 +37,7 @@ function FeedForm({ user }) {
   if (user && user.role === "Admin") {
     return (
       <Grid container justifyContent="center">
+        <h2>Tag form</h2>
         <Grid item xs={12} sm={8} md={6}>
           <Paper elevation={3}>
             <form onSubmit={handleSubmit}>
@@ -50,17 +49,8 @@ function FeedForm({ user }) {
                 fullWidth
                 margin="normal"
               />
-              <TextField
-                label="Description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                fullWidth
-                multiline
-                minRows={4}
-                margin="normal"
-              />
               <Button variant="contained" color="primary" type="submit">
-                Create Feed
+                Create Tag
               </Button>
             </form>
           </Paper>
@@ -72,7 +62,7 @@ function FeedForm({ user }) {
           onClose={handleCloseSnackbar}
         >
           <Alert onClose={handleCloseSnackbar} severity="success">
-            The Feed has been successfully created!
+            The Tag has been successfully created!
           </Alert>
         </Snackbar>
       </Grid>
@@ -86,4 +76,4 @@ const mapStateToProps = (state) => ({
   user: state.auth.user,
 });
 
-export default connect(mapStateToProps)(FeedForm);
+export default connect(mapStateToProps)(TagForm);

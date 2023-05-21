@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
 const ProductForm = () => {
   const dispatch = useDispatch();
   const { topics } = useSelector((state) => state.topic);
-  const { user } = useSelector((state) => state.auth);
+  //   const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
     dispatch(getTopics());
@@ -71,7 +71,6 @@ const ProductForm = () => {
     dispatch(clearErrors());
     let finalProduct = {
       ...product,
-      // images: product.images.split(",").map((item) => item.trim()), // no need to split and trim again
       images: product.images.map((item) => item.trim()),
     };
     dispatch(addProduct(finalProduct))

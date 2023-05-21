@@ -3,6 +3,7 @@ import React from "react";
 // import Topic from "./Topic";
 import FeedForm from "./FeedForm";
 import TopicForm from "./TopicForm";
+import TagForm from "./TagForm";
 import FeedTopicList from "./FeedTopicList";
 import ProductForm from "./ProductForm";
 
@@ -14,6 +15,7 @@ const HomePage = () => {
       <Topic topicId="64663196ff7289dc14daf6cb" /> */}
       <FeedForm />
       <TopicForm />
+      <TagForm />
       <FeedTopicList />
       <ProductForm />
     </div>
