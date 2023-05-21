@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { getCurrentUser } from "./redux/actions/authActions";
 import { getFeeds } from "./redux/actions/feedActions";
+import { getTopics } from "./redux/actions/topicActions";
+import { getProducts } from "./redux/actions/productActions";
 import { getTags } from "./redux/actions/tagActions";
 import NavBar from "./components/NavBar";
 import HomePage from "./components/HomePage";
@@ -10,6 +12,10 @@ import AboutPage from "./components/AboutPage";
 import ProductsPage from "./components/ProductsPage";
 import Login from "./components/Login";
 import Register from "./components/Register";
+import io from "socket.io-client";
+
+// Establish socket connection
+const socket = io(process.env.REACT_APP_API_URL || "http://localhost:5001");
 
 function App() {
   const dispatch = useDispatch();
@@ -21,8 +27,26 @@ function App() {
     ) {
       dispatch(getCurrentUser());
       dispatch(getFeeds());
+      dispatch(getTopics());
+      dispatch(getProducts());
       dispatch(getTags());
     }
+
+    // Listen to 'feedCreated', 'feedUpdated' and 'feedDeleted' events from the server
+    socket.on("feedCreated", () => {
+      dispatch(getFeeds());
+    });
+
+    socket.on("feedUpdated", () => {
+      dispatch(getFeeds());
+    });
+
+    socket.on("feedDeleted", () => {
+      dispatch(getFeeds());
+    });
+
+    // Clean up the effect
+    return () => socket.disconnect();
   }, [dispatch]);
 
   return (

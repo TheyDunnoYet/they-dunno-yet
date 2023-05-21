@@ -1,8 +1,9 @@
-require("dotenv").config();
 const express = require("express");
 const connectDB = require("./config/db");
 const cors = require("cors");
 const rateLimit = require("express-rate-limit");
+const http = require("http");
+const socketIo = require("socket.io");
 
 const app = express();
 
@@ -15,17 +16,36 @@ app.get("/", (req, res) => res.send("API Running"));
 app.use(express.json());
 
 // CORS Middleware
-app.use(cors());
+app.use(cors({ origin: "http://localhost:3000" }));
 
 // Rate Limiting
-app.enable("trust proxy"); // Enable if you're behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
+app.enable("trust proxy");
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  windowMs: 15 * 60 * 1000,
+  max: 100,
 });
 
-app.use(limiter); // Apply rate limiter to all requests
+app.use(limiter);
+
+// Create server with http and express app
+const server = http.createServer(app);
+
+// Create Socket.IO instance attached to the server
+const io = socketIo(server, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+    allowedHeaders: ["my-custom-header"],
+    credentials: true,
+  },
+});
+
+// Make io accessible to our router
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
 
 // Routes
 app.use("/api/auth", require("./routes/auth"));
@@ -38,16 +58,13 @@ app.use("/api/comment", require("./routes/comment"));
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.message);
-
   if (process.env.NODE_ENV === "development") {
-    // In development, send detailed error message
     res.status(500).send({ message: err.message, stack: err.stack });
   } else {
-    // In production, send generic message and hide error details
     res.status(500).send("Server error");
   }
 });
 
 const PORT = process.env.PORT || 5001;
 
-app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+server.listen(PORT, () => console.log(`Server started on port ${PORT}`));

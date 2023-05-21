@@ -60,6 +60,9 @@ router.post(
 
       const feed = await newFeed.save();
 
+      // Emit 'feedCreated' event
+      req.io.emit("feedCreated", feed);
+
       res.json(feed);
     } catch (err) {
       console.error(err.message);
@@ -88,6 +91,9 @@ router.put("/:id", auth, admin, async (req, res) => {
       { new: true }
     );
 
+    // Emit 'feedUpdated' event
+    req.io.emit("feedUpdated", feed);
+
     res.json(feed);
   } catch (err) {
     console.error(err.message);
@@ -104,6 +110,9 @@ router.delete("/:id", auth, admin, async (req, res) => {
     if (!feed) return res.status(404).json({ msg: "Feed not found" });
 
     await Feed.findByIdAndRemove(req.params.id);
+
+    // Emit 'feedDeleted' event
+    req.io.emit("feedDeleted", feed);
 
     res.json({ msg: "Feed removed" });
   } catch (err) {
