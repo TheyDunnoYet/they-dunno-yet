@@ -30,6 +30,9 @@ router.post(
 
       const topic = await newTopic.save();
 
+      // Emit 'topicCreated' event
+      req.io.emit("topicCreated", topic);
+
       res.json(topic);
     } catch (err) {
       console.error(err.message);
@@ -97,6 +100,9 @@ router.put("/:id", auth, admin, async (req, res) => {
       { new: true }
     );
 
+    // Emit 'topicUpdated' event
+    req.io.emit("topicUpdated", topic);
+
     res.json(topic);
   } catch (err) {
     console.error(er.message);
@@ -116,6 +122,9 @@ router.delete("/:id", auth, admin, async (req, res) => {
     }
 
     await Topic.findByIdAndRemove(req.params.id);
+
+    // Emit 'topicDeleted' event
+    req.io.emit("topicDeleted", feed);
 
     res.json({ msg: "Topic removed" });
   } catch (err) {

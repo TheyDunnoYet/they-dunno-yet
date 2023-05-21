@@ -45,6 +45,19 @@ function App() {
       dispatch(getFeeds());
     });
 
+    // Listen to 'topicCreated', 'topicUpdated' and 'topicDeleted' events from the server
+    socket.on("topicCreated", () => {
+      dispatch(getTopics());
+    });
+
+    socket.on("topicUpdated", () => {
+      dispatch(getTopics());
+    });
+
+    socket.on("topicDeleted", () => {
+      dispatch(getTopics());
+    });
+
     // Clean up the effect
     return () => socket.disconnect();
   }, [dispatch]);

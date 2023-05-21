@@ -3,8 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { addProduct } from "../redux/actions/productActions";
 import { clearErrors } from "../redux/actions/errorActions";
 import { getTopics } from "../redux/actions/topicActions";
-
-import { makeStyles } from "@material-ui/core/styles";
 import {
   Button,
   TextField,
@@ -16,6 +14,7 @@ import {
   MenuItem,
 } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
+import { makeStyles } from "@material-ui/core/styles";
 
 // Alert component from material UI
 function Alert(props) {
@@ -32,17 +31,12 @@ const useStyles = makeStyles((theme) => ({
 
 const ProductForm = () => {
   const dispatch = useDispatch();
-  const { topics } = useSelector((state) => state.topic);
-  //   const { user } = useSelector((state) => state.auth);
-
-  useEffect(() => {
-    dispatch(getTopics());
-  }, [dispatch]);
-
+  const { topics, topicErrors } = useSelector((state) => state.topic);
   const { productErrors } = useSelector((state) => state.errors);
 
   const classes = useStyles();
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const [product, setProduct] = useState({
     images: [""],
@@ -54,6 +48,17 @@ const ProductForm = () => {
     dropDate: "",
     topic: "", // initialize topic with an empty string
   });
+
+  useEffect(() => {
+    dispatch(getTopics())
+      .then(() => {
+        setLoading(false);
+      })
+      .catch((err) => {
+        setLoading(false);
+        console.log(err);
+      });
+  }, [dispatch]);
 
   const handleChange = (e) => {
     if (e.target.name === "images") {
@@ -96,6 +101,10 @@ const ProductForm = () => {
     }
     setOpen(false);
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className={classes.root}>
@@ -169,13 +178,16 @@ const ProductForm = () => {
                 onChange={handleChange}
                 name="topic"
               >
-                {topics.map((topic) => (
-                  <MenuItem value={topic._id} key={topic._id}>
-                    {topic.name}
-                  </MenuItem>
-                ))}
+                {topics
+                  .filter((topic) => topic !== undefined) // filter out undefined topics
+                  .map((topic) => (
+                    <MenuItem value={topic._id} key={topic._id}>
+                      {topic.name}
+                    </MenuItem>
+                  ))}
               </Select>
             </FormControl>
+
             <Button type="submit" variant="contained" color="primary">
               Create Product
             </Button>
@@ -188,6 +200,7 @@ const ProductForm = () => {
           </Snackbar>
 
           {productErrors && <Alert severity="error">{productErrors.msg}</Alert>}
+          {topicErrors && <Alert severity="error">{topicErrors.msg}</Alert>}
         </Grid>
       </Grid>
     </div>
