@@ -43,6 +43,9 @@ router.post(
 
       const product = await newProduct.save();
 
+      // Emit 'productCreated' event
+      req.io.emit("productCreated", product);
+
       res.json(product);
     } catch (err) {
       console.error(err.message);
@@ -186,6 +189,9 @@ router.put("/:id", auth, async (req, res) => {
       { new: true }
     );
 
+    // Emit 'productUpdated' event
+    req.io.emit("productUpdated", product);
+
     res.json(product);
   } catch (err) {
     console.error(er.message);
@@ -214,6 +220,9 @@ router.delete("/:id", auth, async (req, res) => {
     await Comment.deleteMany({ product: req.params.id });
 
     await Product.deleteOne({ _id: req.params.id });
+
+    // Emit 'productDeleted' event
+    req.io.emit("productDeleted", product);
 
     res.json({ msg: "Product removed" });
   } catch (err) {

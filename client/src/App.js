@@ -32,31 +32,26 @@ function App() {
       dispatch(getTags());
     }
 
+    const listenToEvent = (eventName, action) => {
+      socket.on(eventName, () => {
+        dispatch(action());
+      });
+    };
+
     // Listen to 'feedCreated', 'feedUpdated' and 'feedDeleted' events from the server
-    socket.on("feedCreated", () => {
-      dispatch(getFeeds());
-    });
-
-    socket.on("feedUpdated", () => {
-      dispatch(getFeeds());
-    });
-
-    socket.on("feedDeleted", () => {
-      dispatch(getFeeds());
-    });
+    ["feedCreated", "feedUpdated", "feedDeleted"].forEach((event) =>
+      listenToEvent(event, getFeeds)
+    );
 
     // Listen to 'topicCreated', 'topicUpdated' and 'topicDeleted' events from the server
-    socket.on("topicCreated", () => {
-      dispatch(getTopics());
-    });
+    ["topicCreated", "topicUpdated", "topicDeleted"].forEach((event) =>
+      listenToEvent(event, getTopics)
+    );
 
-    socket.on("topicUpdated", () => {
-      dispatch(getTopics());
-    });
-
-    socket.on("topicDeleted", () => {
-      dispatch(getTopics());
-    });
+    // Listen to 'productCreated', 'productUpdated' and 'productDeleted' events from the server
+    ["productCreated", "productUpdated", "productDeleted"].forEach((event) =>
+      listenToEvent(event, getProducts)
+    );
 
     // Clean up the effect
     return () => socket.disconnect();

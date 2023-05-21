@@ -6,6 +6,7 @@ import TopicForm from "./TopicForm";
 import TagForm from "./TagForm";
 import FeedTopicList from "./FeedTopicList";
 import ProductForm from "./ProductForm";
+import ProductList from "./ProductList";
 
 const HomePage = () => {
   return (
@@ -13,10 +14,11 @@ const HomePage = () => {
       <h1>Welcome to our site!</h1>
       {/* <Feed feedId="6465714fda9100b04cb18aa1" />
       <Topic topicId="64663196ff7289dc14daf6cb" /> */}
-      <FeedForm />
+      {/* <FeedForm />
       <TopicForm />
       <TagForm />
-      <FeedTopicList />
+      <FeedTopicList /> */}
+      <ProductList />
       <ProductForm />
     </div>
   );
