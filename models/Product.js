@@ -38,7 +38,6 @@ const ProductSchema = new mongoose.Schema({
   marketplace: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Marketplace",
-    required: true,
   },
 });
 

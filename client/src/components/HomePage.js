@@ -16,10 +16,10 @@ const HomePage = () => {
       <h1>Welcome to our site!</h1>
       {/* <Feed feedId="6465714fda9100b04cb18aa1" />
       <Topic topicId="64663196ff7289dc14daf6cb" /> */}
-      {/* <FeedForm />
-      <TopicForm />
-      <TagForm />
-      <FeedTopicList /> */}
+      {/* <FeedForm /> */}
+      {/* <TopicForm /> */}
+      {/* <TagForm /> */}
+      {/* <FeedTopicList /> */}
       {/* <BlockchainForm />
       <MarketplaceForm /> */}
       <ProductList />
