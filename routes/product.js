@@ -36,10 +36,9 @@ router.post(
         "blockchain",
         "Blockchain is required and must be valid id"
       ).isMongoId(),
-      check(
-        "marketplace",
-        "Marketplace is required and must be valid id"
-      ).isMongoId(),
+      check("marketplace", "Marketplace must be valid id if provided")
+        .optional()
+        .isMongoId(),
     ],
   ],
   async (req, res) => {
@@ -70,9 +69,11 @@ router.post(
       }
 
       // Check if the provided marketplace id exists
-      const marketplaceExists = await Marketplace.findById(marketplace);
-      if (!marketplaceExists) {
-        return res.status(400).json({ msg: "Invalid marketplace id" });
+      if (marketplace) {
+        const marketplaceExists = await Marketplace.findById(marketplace);
+        if (!marketplaceExists) {
+          return res.status(400).json({ msg: "Invalid marketplace id" });
+        }
       }
 
       const newProduct = new Product({

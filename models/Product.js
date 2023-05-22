@@ -8,7 +8,23 @@ const ProductSchema = new mongoose.Schema({
   },
   tagline: String,
   description: String,
-  tags: [String],
+  tags: {
+    type: {
+      feed: {
+        type: { _id: String, name: String, acronym: String },
+      },
+      topic: {
+        type: { _id: String, name: String, acronym: String },
+      },
+      blockchain: {
+        type: { _id: String, name: String, acronym: String },
+      },
+      marketplace: {
+        type: { _id: String, name: String, acronym: String },
+      },
+    },
+    default: {},
+  },
   url: String,
   dropDate: Date,
   user: {

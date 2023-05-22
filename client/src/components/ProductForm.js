@@ -126,10 +126,65 @@ const ProductForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     dispatch(clearErrors());
+
     let finalProduct = {
       ...product,
       images: product.images.map((item) => item.trim()),
     };
+
+    // Get the feed, topic, blockchain, and marketplace objects
+    const feedObject = feeds.find((feed) => feed._id === finalProduct.feed);
+    const topicObject = topics.find(
+      (topic) => topic._id === finalProduct.topic
+    );
+    const blockchainObject = blockchains.find(
+      (blockchain) => blockchain._id === finalProduct.blockchain
+    );
+    const marketplaceObject = marketplaces.find(
+      (marketplace) => marketplace._id === finalProduct.marketplace
+    );
+
+    let tags = {};
+
+    // Construct the feed tag
+    if (feedObject) {
+      tags.feed = {
+        _id: feedObject._id,
+        name: feedObject.name,
+        acronym: feedObject.acronym,
+      };
+    }
+
+    // Construct the topic tag
+    if (topicObject) {
+      tags.topic = {
+        _id: topicObject._id,
+        name: topicObject.name,
+        acronym: topicObject.acronym,
+      };
+    }
+
+    // Construct the blockchain tag
+    if (blockchainObject) {
+      tags.blockchain = {
+        _id: blockchainObject._id,
+        name: blockchainObject.name,
+        acronym: blockchainObject.acronym,
+      };
+    }
+
+    // Construct the marketplace tag if applicable
+    if (showMarketplace && marketplaceObject) {
+      tags.marketplace = {
+        _id: marketplaceObject._id,
+        name: marketplaceObject.name,
+        acronym: marketplaceObject.acronym,
+      };
+    }
+
+    // Assign the new tags object to finalProduct
+    finalProduct.tags = tags;
+
     dispatch(addProduct(finalProduct))
       .then(() => {
         setOpen(true);
@@ -254,7 +309,7 @@ const ProductForm = () => {
                 value={product.marketplace}
                 onChange={handleChange}
                 name="marketplace"
-                required
+                required={showMarketplace}
               >
                 {marketplaces
                   .filter(
@@ -305,7 +360,7 @@ const ProductForm = () => {
               fullWidth
               disabled={otherFieldsDisabled}
             />
-            <TextField
+            {/* <TextField
               name="tags"
               value={product.tags[0]}
               onChange={handleChange}
@@ -313,7 +368,7 @@ const ProductForm = () => {
               variant="outlined"
               fullWidth
               disabled={otherFieldsDisabled}
-            />
+            /> */}
             <TextField
               name="url"
               value={product.url}
