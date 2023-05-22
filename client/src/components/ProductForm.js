@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addProduct } from "../redux/actions/productActions";
+import {
+  addProduct,
+  getBlockchains,
+  getMarketplaces,
+} from "../redux/actions/productActions";
 import { clearErrors } from "../redux/actions/errorActions";
 import { getTopics } from "../redux/actions/topicActions";
+import { getFeeds } from "../redux/actions/feedActions";
 import {
   Button,
   TextField,
@@ -16,7 +21,6 @@ import {
 import MuiAlert from "@material-ui/lab/Alert";
 import { makeStyles } from "@material-ui/core/styles";
 
-// Alert component from material UI
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
@@ -31,12 +35,16 @@ const useStyles = makeStyles((theme) => ({
 
 const ProductForm = () => {
   const dispatch = useDispatch();
+  const { feeds, feedErrors } = useSelector((state) => state.feed);
   const { topics, topicErrors } = useSelector((state) => state.topic);
+  const { blockchains } = useSelector((state) => state.product.blockchains);
+  const { marketplaces } = useSelector((state) => state.product.marketplaces);
   const { productErrors } = useSelector((state) => state.errors);
 
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [filteredMarketplaces, setFilteredMarketplaces] = useState([]);
 
   const [product, setProduct] = useState({
     images: [""],
@@ -46,11 +54,19 @@ const ProductForm = () => {
     tags: [""],
     url: "",
     dropDate: "",
-    topic: "", // initialize topic with an empty string
+    topic: "",
+    feed: "",
+    blockchain: "",
+    marketplace: "",
   });
 
   useEffect(() => {
-    dispatch(getTopics())
+    Promise.all([
+      dispatch(getTopics()),
+      dispatch(getFeeds()),
+      dispatch(getBlockchains()),
+      dispatch(getMarketplaces()),
+    ])
       .then(() => {
         setLoading(false);
       })
@@ -59,6 +75,16 @@ const ProductForm = () => {
         console.log(err);
       });
   }, [dispatch]);
+
+  useEffect(() => {
+    if (product.blockchain !== "" && marketplaces) {
+      setFilteredMarketplaces(
+        marketplaces.filter(
+          (marketplace) => marketplace.blockchain === product.blockchain
+        )
+      );
+    }
+  }, [product.blockchain, marketplaces]);
 
   const handleChange = (e) => {
     if (e.target.name === "images") {
@@ -90,6 +116,9 @@ const ProductForm = () => {
           url: "",
           dropDate: "",
           topic: "",
+          feed: "",
+          blockchain: "",
+          marketplace: "",
         });
       })
       .catch((err) => console.log(err));
@@ -111,6 +140,87 @@ const ProductForm = () => {
       <Grid container justifyContent="center">
         <Grid item xs={12} sm={8} md={6}>
           <form onSubmit={handleSubmit}>
+            <FormControl fullWidth className={classes.formControl}>
+              <InputLabel id="demo-simple-select-feed-label">Feed</InputLabel>
+              <Select
+                labelId="demo-simple-select-feed-label"
+                id="demo-simple-select-feed"
+                value={product.feed}
+                onChange={handleChange}
+                name="feed"
+                required
+              >
+                {feeds
+                  .filter((feed) => feed !== undefined) // filter out undefined feeds
+                  .map((feed) => (
+                    <MenuItem value={feed._id} key={feed._id}>
+                      {feed.name}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+
+            <FormControl fullWidth className={classes.formControl}>
+              <InputLabel id="demo-simple-select-topic-label">Topic</InputLabel>
+              <Select
+                labelId="demo-simple-select-topic-label"
+                id="demo-simple-select-topic"
+                value={product.topic}
+                onChange={handleChange}
+                name="topic"
+                required
+              >
+                {topics
+                  .filter((topic) => topic !== undefined) // filter out undefined topics
+                  .map((topic) => (
+                    <MenuItem value={topic._id} key={topic._id}>
+                      {topic.name}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+
+            <FormControl fullWidth className={classes.formControl}>
+              <InputLabel id="demo-simple-select-blockchain-label">
+                Blockchain
+              </InputLabel>
+              <Select
+                labelId="demo-simple-select-blockchain-label"
+                id="demo-simple-select-blockchain"
+                value={product.blockchain}
+                onChange={handleChange}
+                name="blockchain"
+                required
+              >
+                {blockchains &&
+                  blockchains.map((blockchain) => (
+                    <MenuItem value={blockchain.name} key={blockchain.name}>
+                      {blockchain.name}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
+
+            <FormControl fullWidth className={classes.formControl}>
+              <InputLabel id="demo-simple-select-marketplace-label">
+                Marketplace
+              </InputLabel>
+              <Select
+                labelId="demo-simple-select-marketplace-label"
+                id="demo-simple-select-marketplace"
+                value={product.marketplace}
+                onChange={handleChange}
+                name="marketplace"
+                required
+              >
+                {filteredMarketplaces &&
+                  filteredMarketplaces.map((marketplace) => (
+                    <MenuItem value={marketplace.name} key={marketplace.name}>
+                      {marketplace.name}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
             <TextField
               name="images"
               value={product.images[0]}
@@ -169,25 +279,6 @@ const ProductForm = () => {
               type="date"
               InputLabelProps={{ shrink: true }}
             />
-            <FormControl fullWidth className={classes.formControl}>
-              <InputLabel id="demo-simple-select-label">Topic</InputLabel>
-              <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                value={product.topic}
-                onChange={handleChange}
-                name="topic"
-              >
-                {topics
-                  .filter((topic) => topic !== undefined) // filter out undefined topics
-                  .map((topic) => (
-                    <MenuItem value={topic._id} key={topic._id}>
-                      {topic.name}
-                    </MenuItem>
-                  ))}
-              </Select>
-            </FormControl>
-
             <Button type="submit" variant="contained" color="primary">
               Create Product
             </Button>
@@ -200,7 +291,6 @@ const ProductForm = () => {
           </Snackbar>
 
           {productErrors && <Alert severity="error">{productErrors.msg}</Alert>}
-          {topicErrors && <Alert severity="error">{topicErrors.msg}</Alert>}
         </Grid>
       </Grid>
     </div>

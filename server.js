@@ -51,6 +51,8 @@ app.use((req, res, next) => {
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/feed", require("./routes/feed"));
 app.use("/api/topic", require("./routes/topic"));
+app.use("/api/blockchain", require("./routes/blockchain"));
+app.use("/api/marketplace", require("./routes/marketplace"));
 app.use("/api/product", require("./routes/product"));
 app.use("/api/tag", require("./routes/tag"));
 app.use("/api/comment", require("./routes/comment"));

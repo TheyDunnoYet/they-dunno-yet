@@ -19,6 +19,10 @@ const ProductSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Topic",
   },
+  feed: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Feed",
+  },
   upvotes: [
     {
       type: [mongoose.Schema.Types.ObjectId],
@@ -26,6 +30,16 @@ const ProductSchema = new mongoose.Schema({
       default: [],
     },
   ],
+  blockchain: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Blockchain",
+    required: true,
+  },
+  marketplace: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Marketplace",
+    required: true,
+  },
 });
 
 module.exports = mongoose.model("Product", ProductSchema);

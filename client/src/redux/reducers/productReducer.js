@@ -2,10 +2,14 @@ import {
   GET_PRODUCTS,
   PRODUCTS_LOADING,
   ADD_PRODUCT,
+  GET_BLOCKCHAINS,
+  GET_MARKETPLACES,
 } from "../actions/productActions";
 
 const initialState = {
   products: [],
+  blockchains: [],
+  marketplaces: {},
   loading: false,
 };
 
@@ -26,6 +30,16 @@ const productReducer = (state = initialState, action) => {
       return {
         ...state,
         products: [...state.products, action.payload],
+      };
+    case GET_BLOCKCHAINS:
+      return {
+        ...state,
+        blockchains: action.payload,
+      };
+    case GET_MARKETPLACES:
+      return {
+        ...state,
+        marketplaces: action.payload,
       };
     default:
       return state;

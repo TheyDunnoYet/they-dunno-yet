@@ -18,6 +18,7 @@
                 NavBar.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/client/src/components/NavBar.js )
                 Product.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/client/src/components/Product.js )
                 ProductForm.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/client/src/components/ProductForm.js )
+                ProductList.js (  )
                 ProductsPage.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/client/src/components/ProductsPage.js )
                 Register.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/client/src/components/Register.js )
                 TagForm.js ( https://raw.githubusercontent.com/TheyDunnoYet/they-dunno-yet/main/client/src/components/TagForm.js )

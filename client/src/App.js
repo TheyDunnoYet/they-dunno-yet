@@ -5,6 +5,8 @@ import { getCurrentUser } from "./redux/actions/authActions";
 import { getFeeds } from "./redux/actions/feedActions";
 import { getTopics } from "./redux/actions/topicActions";
 import { getProducts } from "./redux/actions/productActions";
+import { getBlockchains } from "./redux/actions/blockchainActions";
+import { getMarketplaces } from "./redux/actions/marketplaceActions";
 import { getTags } from "./redux/actions/tagActions";
 import NavBar from "./components/NavBar";
 import HomePage from "./components/HomePage";
@@ -30,6 +32,8 @@ function App() {
       dispatch(getTopics());
       dispatch(getProducts());
       dispatch(getTags());
+      dispatch(getBlockchains());
+      dispatch(getMarketplaces());
     }
 
     const listenToEvent = (eventName, action) => {
@@ -51,6 +55,16 @@ function App() {
     // Listen to 'productCreated', 'productUpdated' and 'productDeleted' events from the server
     ["productCreated", "productUpdated", "productDeleted"].forEach((event) =>
       listenToEvent(event, getProducts)
+    );
+
+    // Listen to 'blockchainCreated', 'blockchainUpdated' and 'blockchainDeleted' events from the server
+    ["blockchainCreated", "blockchainUpdated", "blockchainDeleted"].forEach(
+      (event) => listenToEvent(event, getBlockchains)
+    );
+
+    // Listen to 'marketplaceCreated', 'marketplaceUpdated' and 'marketplaceDeleted' events from the server
+    ["marketplaceCreated", "marketplaceUpdated", "marketplaceDeleted"].forEach(
+      (event) => listenToEvent(event, getMarketplaces)
     );
 
     // Clean up the effect

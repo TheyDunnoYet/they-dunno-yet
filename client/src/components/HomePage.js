@@ -7,6 +7,8 @@ import TagForm from "./TagForm";
 import FeedTopicList from "./FeedTopicList";
 import ProductForm from "./ProductForm";
 import ProductList from "./ProductList";
+import BlockchainForm from "./BlockchainForm";
+import MarketplaceForm from "./MarketplaceForm";
 
 const HomePage = () => {
   return (
@@ -18,6 +20,8 @@ const HomePage = () => {
       <TopicForm />
       <TagForm />
       <FeedTopicList /> */}
+      {/* <BlockchainForm />
+      <MarketplaceForm /> */}
       <ProductList />
       <ProductForm />
     </div>

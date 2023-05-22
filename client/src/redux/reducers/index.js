@@ -5,6 +5,8 @@ import feedReducer from "./feedReducer";
 import topicReducer from "./topicReducer";
 import productReducer from "./productReducer";
 import tagReducer from "./tagReducer";
+import blockchainReducer from "./blockchainReducer";
+import marketplaceReducer from "./marketplaceReducer";
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -13,6 +15,8 @@ const rootReducer = combineReducers({
   topic: topicReducer,
   tag: tagReducer,
   product: productReducer,
+  blockchain: blockchainReducer,
+  marketplace: marketplaceReducer,
 });
 
 export default rootReducer;

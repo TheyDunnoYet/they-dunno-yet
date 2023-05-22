@@ -6,6 +6,21 @@ const admin = require("../middleware/admin");
 const Product = require("../models/Product");
 const User = require("../models/User");
 const Comment = require("../models/Comment");
+const Blockchain = require("../models/Blockchain");
+const Marketplace = require("../models/Marketplace");
+
+// @route   GET api/product
+// @desc    Get all products
+// @access  Public
+router.get("/", async (req, res) => {
+  try {
+    const products = await Product.find().sort({ date: -1 });
+    res.json(products);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
 
 // @route   POST api/product
 // @desc    Add new product
@@ -17,6 +32,14 @@ router.post(
     [
       check("title", "Title is required").not().isEmpty(),
       check("url", "URL is required").not().isEmpty(),
+      check(
+        "blockchain",
+        "Blockchain is required and must be valid id"
+      ).isMongoId(),
+      check(
+        "marketplace",
+        "Marketplace is required and must be valid id"
+      ).isMongoId(),
     ],
   ],
   async (req, res) => {
@@ -25,10 +48,33 @@ router.post(
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { images, title, tagline, description, tags, url, dropDate, topic } =
-      req.body;
+    const {
+      images,
+      title,
+      tagline,
+      description,
+      tags,
+      url,
+      dropDate,
+      topic,
+      feed,
+      blockchain,
+      marketplace,
+    } = req.body;
 
     try {
+      // Check if the provided blockchain id exists
+      const blockchainExists = await Blockchain.findById(blockchain);
+      if (!blockchainExists) {
+        return res.status(400).json({ msg: "Invalid blockchain id" });
+      }
+
+      // Check if the provided marketplace id exists
+      const marketplaceExists = await Marketplace.findById(marketplace);
+      if (!marketplaceExists) {
+        return res.status(400).json({ msg: "Invalid marketplace id" });
+      }
+
       const newProduct = new Product({
         images,
         title,
@@ -39,6 +85,9 @@ router.post(
         dropDate,
         user: req.user.id,
         topic,
+        feed,
+        blockchain,
+        marketplace,
       });
 
       const product = await newProduct.save();
@@ -53,19 +102,6 @@ router.post(
     }
   }
 );
-
-// @route   GET api/product
-// @desc    Get all products
-// @access  Public
-router.get("/", async (req, res) => {
-  try {
-    const products = await Product.find().sort({ date: -1 });
-    res.json(products);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
-  }
-});
 
 // @route   PUT api/products/upvote/:id
 // @desc    Upvote a product
@@ -159,10 +195,20 @@ router.get("/:id", async (req, res) => {
 // @desc    Update product
 // @access  Private
 router.put("/:id", auth, async (req, res) => {
-  const { images, title, tagline, description, tags, url, dropDate, topic } =
-    req.body;
+  const {
+    images,
+    title,
+    tagline,
+    description,
+    tags,
+    url,
+    dropDate,
+    topic,
+    feed,
+    blockchain,
+    marketplace,
+  } = req.body;
 
-  // Build product object
   const productFields = {};
   if (images) productFields.images = images;
   if (title) productFields.title = title;
@@ -172,6 +218,9 @@ router.put("/:id", auth, async (req, res) => {
   if (url) productFields.url = url;
   if (dropDate) productFields.dropDate = dropDate;
   if (topic) productFields.topic = topic;
+  if (feed) productFields.feed = feed;
+  if (blockchain) productFields.blockchain = blockchain;
+  if (marketplace) productFields.marketplace = marketplace;
 
   try {
     let product = await Product.findById(req.params.id);
@@ -189,7 +238,6 @@ router.put("/:id", auth, async (req, res) => {
       { new: true }
     );
 
-    // Emit 'productUpdated' event
     req.io.emit("productUpdated", product);
 
     res.json(product);

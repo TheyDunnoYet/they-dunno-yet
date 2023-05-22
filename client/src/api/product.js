@@ -39,3 +39,21 @@ export const fetchProduct = async (productId) => {
     throw error;
   }
 };
+
+export const fetchAllBlockchains = async () => {
+  try {
+    const { data } = await API.get("/blockchains");
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const fetchAllMarketplaces = async () => {
+  try {
+    const { data } = await API.get("/marketplaces");
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
