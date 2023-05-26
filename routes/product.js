@@ -8,6 +8,7 @@ const User = require("../models/User");
 const Comment = require("../models/Comment");
 const Blockchain = require("../models/Blockchain");
 const Marketplace = require("../models/Marketplace");
+const upload = require("../middleware/upload");
 
 // @route   GET api/product
 // @desc    Get all products
@@ -40,15 +41,18 @@ router.post(
         .optional()
         .isMongoId(),
     ],
+    upload,
   ],
   async (req, res) => {
+    console.log("Request Body: ", req.body);
+    console.log("Files after multer: ", req.files);
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
 
     const {
-      images,
       title,
       tagline,
       description,
@@ -60,6 +64,20 @@ router.post(
       blockchain,
       marketplace,
     } = req.body;
+
+    // Check if the 'tags' field is a string and parse it back into an object
+    let parsedTags;
+    if (typeof tags === "string") {
+      try {
+        parsedTags = JSON.parse(tags);
+      } catch (err) {
+        return res.status(400).json({ errors: ["Invalid tags format"] });
+      }
+    } else {
+      parsedTags = tags;
+    }
+
+    let images = req.files ? req.files.map((file) => file.location) : [];
 
     try {
       // Check if the provided blockchain id exists
@@ -81,7 +99,7 @@ router.post(
         title,
         tagline,
         description,
-        tags,
+        tags: parsedTags,
         url,
         dropDate,
         user: req.user.id,
