@@ -14,8 +14,22 @@ API.interceptors.request.use((config) => {
 });
 
 export const addProduct = async (product) => {
+  const config = {
+    headers: {
+      "Content-Type": "multipart/form-data",
+      "x-auth-token":
+        localStorage.getItem("jwtToken") || sessionStorage.getItem("jwtToken"),
+    },
+  };
+
+  // console.log("Product before sending: ", product);
+  for (let [key, value] of product.entries()) {
+    console.log(key, value);
+  }
+
   try {
-    const { data } = await API.post("/", product);
+    const { data } = await API.post("/", product, config);
+    // console.log(data);
     return data;
   } catch (error) {
     throw error;

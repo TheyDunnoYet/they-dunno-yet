@@ -14,6 +14,12 @@ export const GET_MARKETPLACES = "GET_MARKETPLACES";
 // Add Product
 export const addProduct = (productData) => (dispatch) => {
   return new Promise((resolve, reject) => {
+    // console.log("Product data: ", productData);
+
+    // for (let [key, value] of productData.entries()) {
+    //   console.log(key, value);
+    // }
+
     addProductApi(productData)
       .then((product) => {
         dispatch({

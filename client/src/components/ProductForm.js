@@ -15,6 +15,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  FormHelperText,
 } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
 import { makeStyles } from "@material-ui/core/styles";
@@ -52,7 +53,7 @@ const ProductForm = () => {
     title: "",
     tagline: "",
     description: "",
-    tags: [""],
+    tags: {},
     url: "",
     dropDate: "",
     topic: "",
@@ -66,12 +67,14 @@ const ProductForm = () => {
   const [marketplaceDisabled, setMarketplaceDisabled] = useState(true);
   const [otherFieldsDisabled, setOtherFieldsDisabled] = useState(true);
 
-  // states to handle the currently selected feed and blockchain
   const [selectedFeed, setSelectedFeed] = useState(null);
   const [selectedBlockchain, setSelectedBlockchain] = useState(null);
 
-  // Add the showMarketplace state
   const [showMarketplace, setShowMarketplace] = useState(false);
+
+  const [errors, setErrors] = useState({});
+
+  const [selectedFiles, setSelectedFiles] = useState([]);
 
   useEffect(() => {
     Promise.all([
@@ -91,10 +94,7 @@ const ProductForm = () => {
 
   const handleChange = (e) => {
     if (e.target.name === "images") {
-      let imageArray = e.target.value
-        ? e.target.value.split(",").map((item) => item.trim())
-        : [""];
-      setProduct({ ...product, [e.target.name]: imageArray });
+      setSelectedFiles([...e.target.files]);
     } else if (e.target.name === "feed") {
       const isNftFeed =
         feeds.find((feed) => feed._id === e.target.value)?.name === "NFT";
@@ -110,16 +110,24 @@ const ProductForm = () => {
       setSelectedBlockchain(e.target.value);
       setProduct({ ...product, [e.target.name]: e.target.value });
       if (showMarketplace) {
-        // If NFT feed is selected
         setMarketplaceDisabled(false);
       } else {
         setOtherFieldsDisabled(false);
       }
     } else if (e.target.name === "marketplace") {
-      setProduct({ ...product, [e.target.name]: e.target.value });
+      if (e.target.value === "") {
+        const { marketplace, ...rest } = product;
+        setProduct(rest);
+      } else {
+        setProduct({ ...product, [e.target.name]: e.target.value });
+      }
       setOtherFieldsDisabled(false);
     } else {
       setProduct({ ...product, [e.target.name]: e.target.value });
+    }
+
+    if (errors[e.target.name]) {
+      setErrors({ ...errors, [e.target.name]: null });
     }
   };
 
@@ -127,82 +135,121 @@ const ProductForm = () => {
     e.preventDefault();
     dispatch(clearErrors());
 
-    let finalProduct = {
-      ...product,
-      images: product.images.map((item) => item.trim()),
-    };
-
-    // Get the feed, topic, blockchain, and marketplace objects
-    const feedObject = feeds.find((feed) => feed._id === finalProduct.feed);
-    const topicObject = topics.find(
-      (topic) => topic._id === finalProduct.topic
-    );
-    const blockchainObject = blockchains.find(
-      (blockchain) => blockchain._id === finalProduct.blockchain
-    );
-    const marketplaceObject = marketplaces.find(
-      (marketplace) => marketplace._id === finalProduct.marketplace
-    );
-
-    let tags = {};
-
-    // Construct the feed tag
-    if (feedObject) {
-      tags.feed = {
-        _id: feedObject._id,
-        name: feedObject.name,
-        acronym: feedObject.acronym,
-      };
+    let errorMessages = {};
+    if (!product.title) errorMessages.title = "Title is required.";
+    if (!product.tagline) errorMessages.tagline = "Tagline is required.";
+    if (!product.description)
+      errorMessages.description = "Description is required.";
+    if (!product.url) errorMessages.url = "URL is required.";
+    if (!product.dropDate) errorMessages.dropDate = "Drop date is required.";
+    if (!product.feed) errorMessages.feed = "Feed is required.";
+    if (!product.topic) errorMessages.topic = "Topic is required.";
+    if (!product.blockchain)
+      errorMessages.blockchain = "Blockchain is required.";
+    if (showMarketplace && !product.marketplace) {
+      errorMessages.marketplace = "Marketplace is required.";
     }
+    if (!selectedFiles.length)
+      errorMessages.images = "At least one image is required.";
 
-    // Construct the topic tag
-    if (topicObject) {
-      tags.topic = {
-        _id: topicObject._id,
-        name: topicObject.name,
-        acronym: topicObject.acronym,
+    setErrors(errorMessages);
+
+    if (Object.keys(errorMessages).length === 0) {
+      const feedObject = feeds.find((feed) => feed._id === product.feed);
+      const topicObject = topics.find((topic) => topic._id === product.topic);
+      const blockchainObject = blockchains.find(
+        (blockchain) => blockchain._id === product.blockchain
+      );
+      const marketplaceObject = marketplaces.find(
+        (marketplace) => marketplace._id === product.marketplace
+      );
+
+      let tags = {};
+
+      if (feedObject) {
+        tags.feed = {
+          _id: feedObject._id,
+          name: feedObject.name,
+          acronym: feedObject.acronym,
+        };
+      }
+
+      if (topicObject) {
+        tags.topic = {
+          _id: topicObject._id,
+          name: topicObject.name,
+          acronym: topicObject.acronym,
+        };
+      }
+
+      if (blockchainObject) {
+        tags.blockchain = {
+          _id: blockchainObject._id,
+          name: blockchainObject.name,
+          acronym: blockchainObject.acronym,
+        };
+      }
+
+      if (showMarketplace && marketplaceObject) {
+        tags.marketplace = {
+          _id: marketplaceObject._id,
+          name: marketplaceObject.name,
+          acronym: marketplaceObject.acronym,
+        };
+      }
+
+      let finalProduct = {
+        ...product,
+        tags: tags,
+        images: product.images.map((item) => item.trim()),
       };
+
+      finalProduct.tags = tags;
+
+      // If marketplace is empty, delete it from finalProduct
+      if (finalProduct.marketplace === "") {
+        delete finalProduct.marketplace;
+      }
+
+      // Create FormData
+      let formData = new FormData();
+      Object.entries(finalProduct).forEach(([key, value]) => {
+        if (key !== "images") {
+          if (key === "tags") {
+            formData.append(key, JSON.stringify(value));
+          } else {
+            formData.append(key, value);
+          }
+        }
+      });
+
+      selectedFiles.forEach((file, index) => {
+        formData.append(`images[${index}]`, file);
+      });
+
+      // for (let [key, value] of formData.entries()) {
+      //   console.log(key, value);
+      // }
+
+      dispatch(addProduct(formData))
+        .then(() => {
+          setOpen(true);
+          setProduct({
+            images: [""],
+            title: "",
+            tagline: "",
+            description: "",
+            tags: {},
+            url: "",
+            dropDate: "",
+            topic: "",
+            feed: "",
+            blockchain: "",
+            marketplace: "",
+          });
+        })
+        .catch((err) => console.log(err));
     }
-
-    // Construct the blockchain tag
-    if (blockchainObject) {
-      tags.blockchain = {
-        _id: blockchainObject._id,
-        name: blockchainObject.name,
-        acronym: blockchainObject.acronym,
-      };
-    }
-
-    // Construct the marketplace tag if applicable
-    if (showMarketplace && marketplaceObject) {
-      tags.marketplace = {
-        _id: marketplaceObject._id,
-        name: marketplaceObject.name,
-        acronym: marketplaceObject.acronym,
-      };
-    }
-
-    // Assign the new tags object to finalProduct
-    finalProduct.tags = tags;
-
-    dispatch(addProduct(finalProduct))
-      .then(() => {
-        setOpen(true);
-        setProduct({
-          images: [""],
-          title: "",
-          tagline: "",
-          description: "",
-          tags: [""],
-          url: "",
-          dropDate: "",
-          topic: "",
-          feed: "",
-          blockchain: "",
-          marketplace: "",
-        });
-      })
-      .catch((err) => console.log(err));
   };
 
   const handleClose = (event, reason) => {
@@ -221,7 +268,11 @@ const ProductForm = () => {
       <Grid container justifyContent="center">
         <Grid item xs={12} sm={8} md={6}>
           <form onSubmit={handleSubmit}>
-            <FormControl fullWidth className={classes.formControl}>
+            <FormControl
+              fullWidth
+              className={classes.formControl}
+              error={errors.feed ? true : false}
+            >
               <InputLabel id="demo-simple-select-feed-label">Feed</InputLabel>
               <Select
                 labelId="demo-simple-select-feed-label"
@@ -229,22 +280,23 @@ const ProductForm = () => {
                 value={product.feed}
                 onChange={handleChange}
                 name="feed"
-                required
               >
                 {feeds
-                  .filter((feed) => feed !== undefined) // filter out undefined feeds
+                  .filter((feed) => feed !== undefined)
                   .map((feed) => (
                     <MenuItem value={feed._id} key={feed._id}>
                       {feed.name}
                     </MenuItem>
                   ))}
               </Select>
+              {errors.feed && <FormHelperText>{errors.feed}</FormHelperText>}
             </FormControl>
 
             <FormControl
               fullWidth
               className={classes.formControl}
               disabled={topicDisabled}
+              error={errors.topic ? true : false}
             >
               <InputLabel id="demo-simple-select-topic-label">Topic</InputLabel>
               <Select
@@ -253,7 +305,6 @@ const ProductForm = () => {
                 value={product.topic}
                 onChange={handleChange}
                 name="topic"
-                required
               >
                 {topics
                   .filter(
@@ -266,12 +317,14 @@ const ProductForm = () => {
                     </MenuItem>
                   ))}
               </Select>
+              {errors.topic && <FormHelperText>{errors.topic}</FormHelperText>}
             </FormControl>
 
             <FormControl
               fullWidth
               className={classes.formControl}
               disabled={blockchainDisabled}
+              error={errors.blockchain ? true : false}
             >
               <InputLabel id="demo-simple-select-blockchain-label">
                 Blockchain
@@ -282,22 +335,25 @@ const ProductForm = () => {
                 value={product.blockchain}
                 onChange={handleChange}
                 name="blockchain"
-                required
               >
                 {blockchains
-                  .filter((blockchain) => blockchain !== undefined) // filter out undefined blockchains
+                  .filter((blockchain) => blockchain !== undefined)
                   .map((blockchain) => (
                     <MenuItem value={blockchain._id} key={blockchain._id}>
                       {blockchain.name}
                     </MenuItem>
                   ))}
               </Select>
+              {errors.blockchain && (
+                <FormHelperText>{errors.blockchain}</FormHelperText>
+              )}
             </FormControl>
 
             <FormControl
               fullWidth
               className={classes.formControl}
               disabled={marketplaceDisabled}
+              error={errors.marketplace ? true : false}
               style={{ display: showMarketplace ? "inline-flex" : "none" }}
             >
               <InputLabel id="demo-simple-select-marketplace-label">
@@ -323,17 +379,34 @@ const ProductForm = () => {
                     </MenuItem>
                   ))}
               </Select>
+              {errors.marketplace && (
+                <FormHelperText>{errors.marketplace}</FormHelperText>
+              )}
             </FormControl>
-            <TextField
-              name="images"
-              value={product.images[0]}
+            <input
+              accept="image/*"
+              className={classes.input}
+              style={{ display: "none" }}
+              id="raised-button-file"
+              multiple
+              type="file"
               onChange={handleChange}
-              label="Product Images"
-              variant="outlined"
-              fullWidth
+              name="images"
               disabled={otherFieldsDisabled}
             />
+            <label htmlFor="raised-button-file">
+              <Button
+                variant="contained"
+                component="span"
+                className={classes.button}
+                disabled={otherFieldsDisabled}
+              >
+                Upload
+              </Button>
+            </label>
             <TextField
+              error={errors.title ? true : false}
+              helperText={errors.title}
               name="title"
               value={product.title}
               onChange={handleChange}
@@ -343,6 +416,8 @@ const ProductForm = () => {
               disabled={otherFieldsDisabled}
             />
             <TextField
+              error={errors.tagline ? true : false}
+              helperText={errors.tagline}
               name="tagline"
               value={product.tagline}
               onChange={handleChange}
@@ -352,6 +427,8 @@ const ProductForm = () => {
               disabled={otherFieldsDisabled}
             />
             <TextField
+              error={errors.description ? true : false}
+              helperText={errors.description}
               name="description"
               value={product.description}
               onChange={handleChange}
@@ -360,16 +437,9 @@ const ProductForm = () => {
               fullWidth
               disabled={otherFieldsDisabled}
             />
-            {/* <TextField
-              name="tags"
-              value={product.tags[0]}
-              onChange={handleChange}
-              label="Product Tags"
-              variant="outlined"
-              fullWidth
-              disabled={otherFieldsDisabled}
-            /> */}
             <TextField
+              error={errors.url ? true : false}
+              helperText={errors.url}
               name="url"
               value={product.url}
               onChange={handleChange}
@@ -379,6 +449,8 @@ const ProductForm = () => {
               disabled={otherFieldsDisabled}
             />
             <TextField
+              error={errors.dropDate ? true : false}
+              helperText={errors.dropDate}
               name="dropDate"
               value={product.dropDate}
               onChange={handleChange}
