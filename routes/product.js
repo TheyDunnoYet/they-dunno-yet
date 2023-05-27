@@ -41,12 +41,8 @@ router.post(
         .optional()
         .isMongoId(),
     ],
-    upload,
   ],
   async (req, res) => {
-    console.log("Request Body: ", req.body);
-    console.log("Files after multer: ", req.files);
-
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -63,6 +59,7 @@ router.post(
       feed,
       blockchain,
       marketplace,
+      image,
     } = req.body;
 
     // Check if the 'tags' field is a string and parse it back into an object
@@ -77,7 +74,7 @@ router.post(
       parsedTags = tags;
     }
 
-    let images = req.files ? req.files.map((file) => file.location) : [];
+    let images = image ? [image] : [];
 
     try {
       // Check if the provided blockchain id exists
@@ -117,6 +114,7 @@ router.post(
       res.json(product);
     } catch (err) {
       console.error(err.message);
+
       res.status(500).send("Server Error");
     }
   }

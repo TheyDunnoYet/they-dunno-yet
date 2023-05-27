@@ -49,7 +49,7 @@ const ProductForm = () => {
   const [loading, setLoading] = useState(true);
 
   const [product, setProduct] = useState({
-    images: [""],
+    image: "",
     title: "",
     tagline: "",
     description: "",
@@ -74,7 +74,7 @@ const ProductForm = () => {
 
   const [errors, setErrors] = useState({});
 
-  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   useEffect(() => {
     Promise.all([
@@ -93,8 +93,9 @@ const ProductForm = () => {
   }, [dispatch]);
 
   const handleChange = (e) => {
-    if (e.target.name === "images") {
-      setSelectedFiles([...e.target.files]);
+    if (e.target.name === "image") {
+      setSelectedFile(e.target.files[0]); // only a single file is now set
+      console.log("File selected:", e.target.files[0]);
     } else if (e.target.name === "feed") {
       const isNftFeed =
         feeds.find((feed) => feed._id === e.target.value)?.name === "NFT";
@@ -149,8 +150,7 @@ const ProductForm = () => {
     if (showMarketplace && !product.marketplace) {
       errorMessages.marketplace = "Marketplace is required.";
     }
-    if (!selectedFiles.length)
-      errorMessages.images = "At least one image is required.";
+    if (!selectedFile) errorMessages.image = "An image is required.";
 
     setErrors(errorMessages);
 
@@ -201,20 +201,18 @@ const ProductForm = () => {
       let finalProduct = {
         ...product,
         tags: tags,
-        images: product.images.map((item) => item.trim()),
+        image: product.image,
       };
 
       finalProduct.tags = tags;
 
-      // If marketplace is empty, delete it from finalProduct
       if (finalProduct.marketplace === "") {
         delete finalProduct.marketplace;
       }
 
-      // Create FormData
       let formData = new FormData();
       Object.entries(finalProduct).forEach(([key, value]) => {
-        if (key !== "images") {
+        if (key !== "image") {
           if (key === "tags") {
             formData.append(key, JSON.stringify(value));
           } else {
@@ -223,19 +221,15 @@ const ProductForm = () => {
         }
       });
 
-      selectedFiles.forEach((file, index) => {
-        formData.append(`images[${index}]`, file);
-      });
-
-      // for (let [key, value] of formData.entries()) {
-      //   console.log(key, value);
-      // }
+      if (selectedFile) {
+        formData.append("image", selectedFile); // append the single file
+      }
 
       dispatch(addProduct(formData))
         .then(() => {
           setOpen(true);
           setProduct({
-            images: [""],
+            image: "",
             title: "",
             tagline: "",
             description: "",
@@ -388,10 +382,9 @@ const ProductForm = () => {
               className={classes.input}
               style={{ display: "none" }}
               id="raised-button-file"
-              multiple
-              type="file"
+              type="file" // removed "multiple" attribute
               onChange={handleChange}
-              name="images"
+              name="image"
               disabled={otherFieldsDisabled}
             />
             <label htmlFor="raised-button-file">

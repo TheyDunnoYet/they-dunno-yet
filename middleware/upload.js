@@ -16,16 +16,32 @@ const s3 = new aws.S3({
 });
 
 const upload = multer({
+  fileFilter: function (req, file, cb) {
+    checkFileType(file, cb);
+  },
   storage: multerS3({
     s3: s3,
     bucket: process.env.SPACES_BUCKET_NAME,
     acl: "public-read",
     key: function (request, file, cb) {
-      console.log("Request in multer: ", req);
-      console.log("File in multer: ", file);
+      console.log("Uploading file:", file);
       cb(null, new Date().toISOString() + "-" + file.originalname);
     },
   }),
-}).array("images", 1);
+}).single("image");
+
+function checkFileType(file, cb) {
+  // Check file type
+  // Allow jpeg, jpg, png, and gifs
+  const filetypes = /jpeg|jpg|png|gif/;
+  const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+  const mimetype = filetypes.test(file.mimetype);
+
+  if (mimetype && extname) {
+    return cb(null, true);
+  } else {
+    cb("Error: Images Only!");
+  }
+}
 
 module.exports = upload;

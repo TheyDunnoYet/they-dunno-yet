@@ -1,5 +1,6 @@
 import {
   addProduct as addProductApi,
+  uploadFileToDigitalOcean,
   fetchAllProducts,
   fetchAllBlockchains,
   fetchAllMarketplaces,
@@ -14,22 +15,31 @@ export const GET_MARKETPLACES = "GET_MARKETPLACES";
 // Add Product
 export const addProduct = (productData) => (dispatch) => {
   return new Promise((resolve, reject) => {
-    // console.log("Product data: ", productData);
+    // Get the image File object from the productData
+    const imageFile = productData.get("image");
 
-    // for (let [key, value] of productData.entries()) {
-    //   console.log(key, value);
-    // }
+    // Call the uploadFileToDigitalOcean function
+    uploadFileToDigitalOcean(imageFile)
+      .then((imageUrl) => {
+        // Replace the image File object with the returned URL in the productData
+        productData.set("image", imageUrl);
 
-    addProductApi(productData)
-      .then((product) => {
-        dispatch({
-          type: ADD_PRODUCT,
-          payload: product,
-        });
-        resolve(product);
+        // Now call the addProductApi function
+        addProductApi(productData)
+          .then((product) => {
+            dispatch({
+              type: ADD_PRODUCT,
+              payload: product,
+            });
+            resolve(product);
+          })
+          .catch((err) => {
+            console.log("Error adding product: ", err);
+            reject(err);
+          });
       })
       .catch((err) => {
-        console.log("Error adding product: ", err);
+        console.log("Error uploading image: ", err);
         reject(err);
       });
   });
