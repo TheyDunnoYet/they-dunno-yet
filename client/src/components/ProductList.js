@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getProducts } from "../redux/actions/productActions";
+import ProductCard from "./ProductCard";
 
 const ProductList = () => {
   const dispatch = useDispatch();
@@ -13,13 +14,9 @@ const ProductList = () => {
   return loading ? (
     <p>Loading...</p>
   ) : (
-    <div>
+    <div className="px-4 py-6">
       {products.map((product) => (
-        <div key={product._id}>
-          <h2>{product.title}</h2>
-          <p>{product.description}</p>
-          {/* You can add more fields here as needed */}
-        </div>
+        <ProductCard key={product._id} product={product} />
       ))}
     </div>
   );

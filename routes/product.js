@@ -8,7 +8,7 @@ const User = require("../models/User");
 const Comment = require("../models/Comment");
 const Blockchain = require("../models/Blockchain");
 const Marketplace = require("../models/Marketplace");
-const upload = require("../middleware/upload");
+// const upload = require("../middleware/upload");
 
 // @route   GET api/product
 // @desc    Get all products

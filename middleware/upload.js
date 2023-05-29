@@ -16,32 +16,29 @@ const s3 = new aws.S3({
 });
 
 const upload = multer({
-  fileFilter: function (req, file, cb) {
-    checkFileType(file, cb);
+  fileFilter: (req, file, cb) => {
+    // validate file
+    console.log("file data", file);
+    const isValid = true;
+    cb(null, isValid);
+    // cb(new Error("I don't have a clue!")); can also throw errors
   },
   storage: multerS3({
-    s3: s3,
-    bucket: process.env.SPACES_BUCKET_NAME,
+    s3: new aws.S3({
+      accessKeyId: process.env.SPACES_ACCESS_KEY_ID || null,
+      secretAccessKey: process.env.SPACES_SECRET_ACCESS_KEY || null,
+      endpoint: process.env.SPACES_ENDPOINT || null,
+      signatureVersion: "v4",
+    }),
+    bucket: process.env.SPACES_BUCKET_NAME || null,
+    contentType: multerS3.AUTO_CONTENT_TYPE,
     acl: "public-read",
-    key: function (request, file, cb) {
-      console.log("Uploading file:", file);
-      cb(null, new Date().toISOString() + "-" + file.originalname);
+    key: (req, file, cb) => {
+      // save file to Spaces, you can use / to add folders directory
+      const fileName = Date.now().toString(); //file.originalname;
+      cb(null, `test/${fileName}`);
     },
   }),
-}).single("image");
-
-function checkFileType(file, cb) {
-  // Check file type
-  // Allow jpeg, jpg, png, and gifs
-  const filetypes = /jpeg|jpg|png|gif/;
-  const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = filetypes.test(file.mimetype);
-
-  if (mimetype && extname) {
-    return cb(null, true);
-  } else {
-    cb("Error: Images Only!");
-  }
-}
+}).array("image", 1);
 
 module.exports = upload;
