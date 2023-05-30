@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import "./helpers/reset.scss";
+@import "./helpers/variables.scss";
+
+a {
+  &:hover {
+    cursor: pointer;
+  }
+}

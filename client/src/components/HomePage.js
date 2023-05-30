@@ -1,27 +1,31 @@
 import React from "react";
-// import Feed from "./Feed";
-// import Topic from "./Topic";
-import FeedForm from "./FeedForm";
-import TopicForm from "./TopicForm";
-import TagForm from "./TagForm";
-import FeedTopicList from "./FeedTopicList";
 import ProductForm from "./ProductForm";
 import ProductList from "./ProductList";
-import BlockchainForm from "./BlockchainForm";
-import MarketplaceForm from "./MarketplaceForm";
+
+const people = [
+  {
+    name: "Calvin Hawkins",
+    email: "calvin.hawkins@example.com",
+    image:
+      "https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+  },
+  {
+    name: "Kristen Ramos",
+    email: "kristen.ramos@example.com",
+    image:
+      "https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+  },
+  {
+    name: "Ted Fox",
+    email: "ted.fox@example.com",
+    image:
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+  },
+];
 
 const HomePage = () => {
   return (
-    <div>
-      <h1>Welcome to our site!</h1>
-      {/* <Feed feedId="6465714fda9100b04cb18aa1" />
-      <Topic topicId="64663196ff7289dc14daf6cb" /> */}
-      {/* <FeedForm /> */}
-      {/* <TopicForm /> */}
-      {/* <TagForm /> */}
-      {/* <FeedTopicList /> */}
-      {/* <BlockchainForm />
-      <MarketplaceForm /> */}
+    <div className="container mx-auto">
       <ProductList />
       <ProductForm />
     </div>
