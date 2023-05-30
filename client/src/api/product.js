@@ -10,7 +10,14 @@ API.interceptors.request.use((config) => {
   const token =
     localStorage.getItem("jwtToken") || sessionStorage.getItem("jwtToken");
   config.headers["x-auth-token"] = token ? `${token}` : "";
-  config.headers["Content-type"] = "application/json";
+  // Check if the request contains form data
+  if (config.headers["Content-Type"] === "multipart/form-data") {
+    // Update the 'Content-Type' header to 'multipart/form-data'
+    config.headers["Content-Type"] = "multipart/form-data";
+  } else {
+    // Set the default 'Content-Type' header to 'application/json'
+    config.headers["Content-Type"] = "application/json";
+  }
   return config;
 });
 
@@ -39,10 +46,47 @@ export async function uploadFileToDigitalOcean(file) {
   }
 }
 
-export const addProduct = async (product) => {
+// export const uploadImage = async (formData) => {
+//   const config = {
+//     headers: {
+//       'Content-Type': 'multipart/form-data',
+//       'x-auth-token':
+//         localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken'),
+//     },
+//   }
+
+//   try {
+//     const response = await axios.post(
+//       'http://localhost:5001/api/product/upload',
+//       formData,
+//       config
+//     )
+//     return response.data
+//   } catch (error) {
+//     throw error
+//   }
+// }
+
+export const uploadImage = async (formData) => {
   const config = {
     headers: {
       "Content-Type": "multipart/form-data",
+      "x-auth-token":
+        localStorage.getItem("jwtToken") || sessionStorage.getItem("jwtToken"),
+    },
+  };
+
+  try {
+    const response = await API.post("/upload", formData, config);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const addProduct = async (product) => {
+  const config = {
+    headers: {
       "x-auth-token":
         localStorage.getItem("jwtToken") || sessionStorage.getItem("jwtToken"),
     },

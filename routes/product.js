@@ -8,7 +8,53 @@ const User = require("../models/User");
 const Comment = require("../models/Comment");
 const Blockchain = require("../models/Blockchain");
 const Marketplace = require("../models/Marketplace");
-const upload = require("../middleware/upload");
+const multer = require("multer");
+// const upload = require('../middleware/upload')
+const s3 = require("../config/s3Config");
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+});
+
+// @route   POST api/upload
+// @desc    Uploads an image
+// @access  Public
+router.post("/upload", upload.single("image"), async (req, res) => {
+  console.log("IN Upload ftn: ");
+
+  try {
+    const file = req.file;
+
+    console.log("FILE: ", file);
+
+    // Upload the image to your DigitalOcean Space
+    const uploadParams = {
+      Bucket: process.env.SPACES_BUCKET_NAME,
+      Key: `${Date.now()}-${file.originalname}`,
+      Body: file.buffer,
+      ContentType: file.mimetype,
+      ACL: "public-read",
+    };
+
+    const uploadedObject = await s3.upload(uploadParams).promise();
+    const imageUrl = uploadedObject.Location;
+
+    console.log("Image Url: ", imageUrl);
+
+    // const product = new Product({
+    //   imageUrl,
+    //   // Add other properties as needed
+    // })
+
+    // await product.save()
+
+    // Return the URL of the uploaded image in the response
+    res.json({ imageUrl: uploadedObject.Location });
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    res.status(500).json({ error: "Failed to upload image" });
+  }
+});
 
 // @route   GET api/product
 // @desc    Get all products
@@ -29,7 +75,7 @@ router.get("/", async (req, res) => {
 router.post(
   "/",
   [
-    auth,
+    // auth,
     [
       check("title", "Title is required").not().isEmpty(),
       check("url", "URL is required").not().isEmpty(),
@@ -62,6 +108,8 @@ router.post(
       image,
     } = req.body;
 
+    console.log("Upload Product Function Called: ", image);
+
     // Check if the 'tags' field is a string and parse it back into an object
     let parsedTags;
     if (typeof tags === "string") {
@@ -74,9 +122,12 @@ router.post(
       parsedTags = tags;
     }
 
+    console.log("IN THERE...");
+
     let images = image ? [image] : [];
 
     try {
+      console.log("IN TRY...");
       // Check if the provided blockchain id exists
       const blockchainExists = await Blockchain.findById(blockchain);
       if (!blockchainExists) {
@@ -91,6 +142,8 @@ router.post(
         }
       }
 
+      console.log("IN market...");
+
       const newProduct = new Product({
         images,
         title,
@@ -99,7 +152,7 @@ router.post(
         tags: parsedTags,
         url,
         dropDate,
-        user: req.user.id,
+        user: "6468d5077edefc243bc3e1ec",
         topic,
         feed,
         blockchain,
