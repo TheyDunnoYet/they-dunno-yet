@@ -25,8 +25,6 @@ router.post("/upload", upload.single("image"), async (req, res) => {
   try {
     const file = req.file;
 
-    console.log("FILE: ", file);
-
     // Upload the image to your DigitalOcean Space
     const uploadParams = {
       Bucket: process.env.SPACES_BUCKET_NAME,
@@ -38,15 +36,6 @@ router.post("/upload", upload.single("image"), async (req, res) => {
 
     const uploadedObject = await s3.upload(uploadParams).promise();
     const imageUrl = uploadedObject.Location;
-
-    console.log("Image Url: ", imageUrl);
-
-    // const product = new Product({
-    //   imageUrl,
-    //   // Add other properties as needed
-    // })
-
-    // await product.save()
 
     // Return the URL of the uploaded image in the response
     res.json({ imageUrl: uploadedObject.Location });
@@ -75,7 +64,7 @@ router.get("/", async (req, res) => {
 router.post(
   "/",
   [
-    // auth,
+    auth,
     [
       check("title", "Title is required").not().isEmpty(),
       check("url", "URL is required").not().isEmpty(),
@@ -108,8 +97,6 @@ router.post(
       image,
     } = req.body;
 
-    console.log("Upload Product Function Called: ", image);
-
     // Check if the 'tags' field is a string and parse it back into an object
     let parsedTags;
     if (typeof tags === "string") {
@@ -122,12 +109,9 @@ router.post(
       parsedTags = tags;
     }
 
-    console.log("IN THERE...");
-
     let images = image ? [image] : [];
 
     try {
-      console.log("IN TRY...");
       // Check if the provided blockchain id exists
       const blockchainExists = await Blockchain.findById(blockchain);
       if (!blockchainExists) {
@@ -142,8 +126,6 @@ router.post(
         }
       }
 
-      console.log("IN market...");
-
       const newProduct = new Product({
         images,
         title,
@@ -152,7 +134,7 @@ router.post(
         tags: parsedTags,
         url,
         dropDate,
-        user: "6468d5077edefc243bc3e1ec",
+        user: req.user.id,
         topic,
         feed,
         blockchain,
