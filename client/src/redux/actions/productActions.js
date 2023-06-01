@@ -1,9 +1,9 @@
 import {
   addProduct as addProductApi,
-  uploadFileToDigitalOcean,
   fetchAllProducts,
   fetchAllBlockchains,
   fetchAllMarketplaces,
+  uploadImage,
 } from "../../api/product";
 
 export const ADD_PRODUCT = "ADD_PRODUCT";
@@ -18,11 +18,12 @@ export const addProduct = (productData) => (dispatch) => {
     // Get the image File object from the productData
     const imageFile = productData.get("image");
 
-    // Call the uploadFileToDigitalOcean function
-    uploadFileToDigitalOcean(imageFile)
-      .then((imageUrl) => {
-        // Replace the image File object with the returned URL in the productData
-        productData.set("image", imageUrl);
+    const formData = new FormData();
+    formData.append("image", imageFile);
+
+    uploadImage(formData)
+      .then((data) => {
+        productData.set("image", data.imageUrl);
 
         // Now call the addProductApi function
         addProductApi(productData)
@@ -38,10 +39,37 @@ export const addProduct = (productData) => (dispatch) => {
             reject(err);
           });
       })
-      .catch((err) => {
-        console.log("Error uploading image: ", err);
-        reject(err);
+      .catch((error) => {
+        console.error("Error uploading image:", error);
       });
+
+    // CALL UPLOAD API HERE, AND GET A URL AND THEN SEND THAT TO add Product Api.
+
+    // Call the uploadFileToDigitalOcean function
+
+    // uploadFileToDigitalOcean(imageFile)
+    //   .then((imageUrl) => {
+    //     // Replace the image File object with the returned URL in the productData
+    //     productData.set('image', imageUrl)
+
+    //     // Now call the addProductApi function
+    //     addProductApi(productData)
+    //       .then((product) => {
+    //         dispatch({
+    //           type: ADD_PRODUCT,
+    //           payload: product,
+    //         })
+    //         resolve(product)
+    //       })
+    //       .catch((err) => {
+    //         console.log('Error adding product: ', err)
+    //         reject(err)
+    //       })
+    //   })
+    //   .catch((err) => {
+    //     console.log('Error uploading image: ', err)
+    //     reject(err)
+    //   })
   });
 };
 

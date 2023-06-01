@@ -1,10 +1,15 @@
 import React from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ChevronUpIcon } from "@heroicons/react/24/solid";
+import { Navigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const tagColors = ["bg-slate-200"];
 
 const ProductCard = ({ product }) => {
-  const { _id, title, tagline, images, tags, upvotes } = product;
+  const { title, tagline, images, tags, upvotes } = product;
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const [isUpvoted, setIsUpvoted] = React.useState(false);
 
@@ -35,6 +40,8 @@ const ProductCard = ({ product }) => {
     }
   }
 
+  console.log("Product from ProductCard: ", product);
+
   return (
     <div className="flex bg-white shadow rounded-md p-6 my-4 items-center">
       <div className="flex-none">
@@ -47,6 +54,13 @@ const ProductCard = ({ product }) => {
       <div className="flex-grow ml-4">
         <h3 className="text-lg font-semibold mb-2">{title}</h3>
         <p className="text-gray-500 mb-2">{tagline}</p>
+        <button
+          onClick={() => {
+            navigate(`/product/${product._id}`, { state: { modal: product } });
+          }}
+        >
+          View Details
+        </button>
         <div className="flex flex-wrap">{tagElements}</div>
       </div>
       <div className="flex-none ml-4">

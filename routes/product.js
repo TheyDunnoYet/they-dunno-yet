@@ -8,7 +8,43 @@ const User = require("../models/User");
 const Comment = require("../models/Comment");
 const Blockchain = require("../models/Blockchain");
 const Marketplace = require("../models/Marketplace");
-// const upload = require("../middleware/upload");
+const multer = require("multer");
+// const upload = require('../middleware/upload')
+const s3 = require("../config/s3Config");
+require("dotenv").config();
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+});
+
+// @route   POST api/upload
+// @desc    Uploads an image
+// @access  Public
+router.post("/upload", upload.single("image"), async (req, res) => {
+  console.log("IN Upload ftn: ");
+
+  try {
+    const file = req.file;
+
+    // Upload the image to your DigitalOcean Space
+    const uploadParams = {
+      Bucket: process.env.SPACES_BUCKET_NAME,
+      Key: `${Date.now()}-${file.originalname}`,
+      Body: file.buffer,
+      ContentType: file.mimetype,
+      ACL: "public-read",
+    };
+
+    const uploadedObject = await s3.upload(uploadParams).promise();
+    const imageUrl = uploadedObject.Location;
+
+    // Return the URL of the uploaded image in the response
+    res.json({ imageUrl: uploadedObject.Location });
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    res.status(500).json({ error: "Failed to upload image" });
+  }
+});
 
 // @route   GET api/product
 // @desc    Get all products

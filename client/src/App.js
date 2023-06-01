@@ -1,5 +1,10 @@
 import React, { useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  useLocation,
+  BrowserRouter as Router,
+  Routes,
+  Route,
+} from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { getCurrentUser } from "./redux/actions/authActions";
 import { getFeeds } from "./redux/actions/feedActions";
@@ -15,9 +20,27 @@ import ProductsPage from "./components/ProductsPage";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import io from "socket.io-client";
+import ProductModal from "./components/ProductModal";
 
 // Establish socket connection
 const socket = io(process.env.REACT_APP_API_URL || "http://localhost:5001");
+
+const RoutesWrapper = () => {
+  const location = useLocation();
+  return (
+    <>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/products" element={<ProductsPage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/product/:productId" element={<ProductModal />} />
+      </Routes>
+      {location.state?.modal && <ProductModal />}
+    </>
+  );
+};
 
 function App() {
   const dispatch = useDispatch();
@@ -74,13 +97,7 @@ function App() {
   return (
     <Router>
       <NavBar />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/products" element={<ProductsPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-      </Routes>
+      <RoutesWrapper />
     </Router>
   );
 }
