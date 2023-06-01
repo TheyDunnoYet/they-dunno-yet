@@ -11,6 +11,7 @@ const Marketplace = require("../models/Marketplace");
 const multer = require("multer");
 // const upload = require('../middleware/upload')
 const s3 = require("../config/s3Config");
+require("dotenv").config();
 
 const upload = multer({
   storage: multer.memoryStorage(),

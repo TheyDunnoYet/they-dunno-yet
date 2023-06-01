@@ -94,8 +94,6 @@ const NavBar = ({ auth: { isAuthenticated }, logout, feeds, getFeeds }) => {
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  console.log(feeds);
-
   return (
     <header className="bg-white">
       <nav

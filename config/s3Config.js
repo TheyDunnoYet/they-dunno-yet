@@ -1,4 +1,5 @@
 const AWS = require("aws-sdk");
+require("dotenv").config();
 
 // Configure AWS SDK with your DigitalOcean Spaces credentials
 AWS.config.update({
